@@ -70,6 +70,7 @@ function Jugador(nick,juego){
     this.juego=juego;
     this.mano=[];
     this.codigoPartida;
+    this.turno=false;                               //new
     this.crearPartida=function(numJug){
         return this.juego.crearPartida(nick,numJug);
     }
@@ -89,6 +90,13 @@ function Jugador(nick,juego){
     this.obtenerPartida=function(codigo){
         return this.juego.partidas[codigo];
     }
+    this.pasarTurno=function(){                     //new
+        this.partida.pasarTurno();
+    }
+    this.jugarCarta=function(carta){                //new
+        this.partida.jugarCarta(carta);
+    }
+
 }
 
 function Partida(codigo,jugador,numJug){
@@ -97,6 +105,8 @@ function Partida(codigo,jugador,numJug){
     this.propietario=jugador.nick;
     this.numJug=numJug;
     this.jugadores={};
+    this.listaJugadores=[];                         //new
+    this.mesa=[];                                   //new
     this.fase=new Inicial();
 
     this.unirAPartida=function(jugador){
@@ -105,6 +115,7 @@ function Partida(codigo,jugador,numJug){
     this.puedeUnirAPartida=function(jugador){
         this.jugadores[jugador.nick]=jugador;
         jugador.codigoPartida=this.codigo;
+        this.listaJugadores.push(jugador.nick);     //new
     }
     this.numeroJugadores=function(){
 		return Object.keys(this.jugadores).length;
@@ -152,8 +163,66 @@ function Partida(codigo,jugador,numJug){
         return cartas;
     }
 
+    //Calcula quien es el siguiente jugador y le asigna el turno
+    this.pasarTurno=function(){                     //new
+        var aux = this.listaJugadores.shift();      //cogemos y eliminamos el jugador inicial
+        aux.turno = false;                          //asignamos a que no tenga el turno
+        this.listaJugadores.push(aux);              //lo devolvemos al la lista de jugadores
+        this.listaJugadores[0].turno = true;        //asignamos el turno al siguiente jugador
+    }
+
+    //asigna el turno inicial al primer jugador
+    this.turnoInicial=function(){                       //new         
+        this.propietario.turno=true;
+    }
+
+    //funcion auxiliar de jugarCarta()
+    this.ponerEnJuego=function(carta){                  //new
+        var aux = this.jugador.mano.splice(carta,1);
+        this.mesa.push(aux);
+    }
+
+    //Controlamos que la carta se pueda jugar
+    this.jugarCarta=function(carta){                    //new
+        var last = this.mesa[this.mesa.length-1];       //ultima carta de la mesa (carta en juego)
+        if ((carta == Comodin) || (carta == Comodin4)){
+           this.ponerEnJuego(carta);
+        }
+        else if (last == Numero){
+            if ((last.color == carta.color) || (last.valor == carta.valor)) {
+                this.ponerEnJuego(carta);
+            }
+        }
+        else if (last == Cambio){
+            if ((last.color == carta.color) || (carta == Cambio)) {
+                this.ponerEnJuego(carta);
+            }
+        }
+        else if (last == Bloqueo){
+            if ((last.color == carta.color) || (carta == Bloqueo)) {
+                this.ponerEnJuego(carta);
+            }
+        }
+        else if (last == Mas2){
+            if ((last.color == carta.color) || (carta == Mas2)) {
+                this.ponerEnJuego(carta);
+            }
+        }
+        else {
+            console.log("No se puede realizar la jugada, es ilegal");
+        }
+    }
+
+    //Colocamos la carta inicial del juego
+    this.cartaInicial=function(){                   //new
+        this.mesa.push(this.asignarUnaCarta());
+    }
+
     this.crearMazo();
     this.unirAPartida(jugador);
+    this.turnoInicial();                            //new
+    this.cartaInicial();                            //new
+
 }
 
 function Inicial(){
