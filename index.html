@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Theme Made By www.w3schools.com - No Copyright -->
+  <title>El Juego del Uno</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style> 
+  body {
+    font: 20px Montserrat, sans-serif;
+    line-height: 1.8;
+    color: #f5f6f7;
+  }
+  p {font-size: 16px;}
+  .margin {margin-bottom: 25px;}
+  .bg-1 { 
+    background-color: #1abc9c; /* Green */
+    color: #ffffff;
+  }
+  .bg-2 { 
+    background-color: #474e5d; /* Dark Blue */
+    color: #ffffff;
+  }
+  .bg-3 { 
+    background-color: #ffffff; /* White */
+    color: #555555;
+  }
+  .bg-4 { 
+    background-color: #2f2f2f; /* Black Gray */
+    color: #fff;
+  }
+  .container-fluid {
+    padding-top: 25px;
+    padding-bottom: 50px;
+  }
+  .navbar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+    font-size: 12px;
+    letter-spacing: 5px;
+  }
+  .navbar-nav  li a:hover {
+    color: #1abc9c !important;
+  }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">El Uno</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Como Jugar</a></li>
+        <li><a href="#">Login</a></li>
+        <li><a href="#">Registro</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- First Container -->
+<div class="container-fluid bg-1 text-center">
+  <h1 class="margin">El Juego del Uno</h1>
+  <img src="logo.jpg" class="img-responsive img-circle margin" style="display:inline" alt="Logo" width="250" height="250">
+  <h1>El Juego de tus sueños</h1>
+</div>
+
+<!-- Second Container -->
+<div class="container-fluid bg-2 text-center">
+  <h1 class="margin">Explicación del juego</h1>
+  <p>Uno es un juego multijugador en el que cada jugador juega una carta,
+     la cual puede tener efectos especiales, haciendo asi el juego mucho más divertido.
+     Y no te olvides de decir "Uno" ó "Me queda una" cuando solo te quede una carta,
+     esto hará que el resto de jugadores centren su atención en tí.</p>
+  <a href="#" class="btn btn-default btn-lg">
+    <span class="glyphicon glyphicon-search"></span> Reglas
+  </a>
+</div>
+
+<!-- Third Container (Grid) -->
+<div class="container-fluid bg-3 text-center">    
+  <h1 class="margin">Tipos de Cartas</h1>
+  <div class="row">
+    <div class="col-sm-4">
+      <h3 class="margin">Cartas Básicas</h3>
+      <p>Formadas por los núemros del 0 al 9 y de cuatro colores distintos.</p>
+      <img src="cartasBasicas.jpg" class="img-responsive margin" style="width:100%" alt="CB">
+    </div>
+    <div class="col-sm-4">
+      <h3 class="margin">Cartas Especiales</h3> 
+      <p>También llamadas figuras, estas cartas tienen efectos especiales que sirven para interactuar con el resto de jugadores de alguna forma.</p>
+      <img src="cartasEspeciales.jpg" class="img-responsive margin" style="width:100%" alt="CE">
+    </div>
+    <div class="col-sm-4">
+      <h3 class="margin">Cartas Super Especiales</h3> 
+      <p>Caracterizadas por su color negro, ofrecen siempre una gran utilidad ante casi cualquier situación.</p>
+      <img src="cartasSuperEspeciales.jpg" class="img-responsive margin" style="width:100%" alt="CSE">
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="container-fluid bg-4 text-center">
+  <p>Bootstrap Theme Made By Jesús González with the help of <a href="https://www.w3schools.com">www.w3schools.com</a></p> 
+</footer>
+
+</body>
+</html>
