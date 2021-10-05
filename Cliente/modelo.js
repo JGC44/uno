@@ -196,6 +196,7 @@ function Partida(codigo,jugador,numJug){
         else if (last == Cambio){
             if ((last.color == carta.color) || (carta == Cambio)) {
                 this.ponerEnJuego(carta);
+                this.listaJugadores.reverse();              //Invertimos el orden de los turnos
             }
         }
         else if (last == Bloqueo){
