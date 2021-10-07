@@ -281,3 +281,14 @@ function Comodin4(valor){
     this.tipo="comodin4";
     this.valor=valor;
 }
+
+function Prueba(){
+    juego = new Juego();
+    juego.agregarJugador("ana");
+    ju1 = juego.usuarios["ana"];
+    ju1.crearPartida(2);
+    juego.agregarJugador("pepe");
+    ju2 = juego.usuarios["pepe"];
+    ju2.unirAPartida(ju1.codigoPartida);
+    partida = juego.partidas[ju1.codigoPartida];
+}
