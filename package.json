@@ -1,0 +1,23 @@
+{
+  "name": "uno",
+  "version": "1.0.0",
+  "description": "Trabajo de la asignatura de Procesos Software 21/22",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jasmine-node servidor"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JGC44/uno.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JGC44/uno/issues"
+  },
+  "homepage": "https://github.com/JGC44/uno#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jasmine-node": "^3.0.0"
+  }
+}
