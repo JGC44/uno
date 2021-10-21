@@ -18,4 +18,5 @@ function ClienteRest() {
             console.log(data);
         })
     }
+    
 }
