@@ -19,6 +19,15 @@ function ClienteWS() {
     this.manoInicial=function () {
         this.socket.emit("manoInicial", this.nick);
     }
+    this.jugarCarta=function(num){
+		this.socket.emit("jugarCarta",this.nick,num);
+	}
+    this.robarCarta=function(num){
+		this.socket.emit("robarCarta",this.nick,num);
+	}
+    this.pasarTurno=function(){
+		this.socket.emit("pasarTurno",this.nick);
+	}
 
     //Espera de respuestas, a la escucha (Zona servidor del clienteWS)
     this.servidorWSCliente = function () {
@@ -40,6 +49,12 @@ function ClienteWS() {
         this.socket.on("mano",function (data) {
             console.log(data);
         });
+        this.socket.on("turno",function(data){
+			console.log(data);
+		});
+        this.socket.on("fallo",function(data){
+			console.log(data);
+		});
     }
 
     this.conectar();
