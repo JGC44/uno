@@ -46,11 +46,14 @@ app.get("/crearPartida/:num/:nick", function (request, response) {
 //unir a partida (Error)
 app.get("/unirAPartida/:codigo/:nick", function (request, response) {
     var nick = request.params.nick;
-    var cod = request.params.codigo;
+    var codigo = request.params.codigo;
+    var ju2 = juego.usuarios[nick];
     var res = { codigo: -1 };
-    if (ju) {
-        var partida = ju.unirAPartida(codigo);
+    // if (ju2)
+    if (juego.partidas[codigo] && (!juego.partidas[codigo].jugadores[nick])) {
+        ju2.unirAPartida(codigo);
         console.log("Jugador de " + nick + " se ha unido a la partida de codigo: " + ju.codigoPartida);
+        //res.code=500; //si funciona bien
         res.codigo = ju.codigoPartida;
     }
     response.send(res);
@@ -67,6 +70,34 @@ app.get("/obtenerListaPartidas",function(request,response){
 http.listen(app.get('port'), function () {
     console.log("La app NodeJS se esta ejecutando en el puerto", app.get("port"));
 });
+
+//jugar carta
+app.get("/jugarCarta/:nick/:numero", function (request, response) {
+    var nick = request.params.nick;
+    var numeroCarta = request.params.numero;
+    var jugador = juego.usuarios[nick];
+
+    var res ={code:-1};
+    if (jugador.mano.length!=0){
+        jugador.jugarCarta(numeroCarta);
+        res.code=500;//si funciona bien
+    }
+    response.send(res);
+})
+
+//robar cartas
+app.get("/robar/:nick/:numero", function (request, response) {
+    var nick = request.params.nick;
+    var cartasARobar = request.params.numero;
+    var jugador = juego.usuarios[nick];
+
+    var res ={code:-1};
+    if (jugador.mano){//no se que poner
+        jugador.robar(cartasARobar);
+        res.code=500;
+    }
+    response.send(res);
+})
 
 //lanzar el servidor de WS
 servidorWS.lanzarServidorWS(io, juego);

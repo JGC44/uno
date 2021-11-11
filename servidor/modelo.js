@@ -38,7 +38,6 @@ function Juego() {
             var partida = this.partidas[each];
             lista.push({ propietario: partida.propietario, codigo: each })
         }
-
         return lista;
     }
 

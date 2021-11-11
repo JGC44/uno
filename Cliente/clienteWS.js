@@ -39,17 +39,33 @@ function ClienteWS() {
             console.log(datos);
             cli.codigo = datos.codigo;
         });
+        this.socket.on("partidaCreada",function(data){
+			console.log(data);
+			cli.codigo=data.codigo;
+			iu.mostrarCodigo(cli.codigo);
+		});
         this.socket.on("unidoAPartida",function (datos) {
             console.log(datos);
             cli.codigo = datos.codigo;
         });
         this.socket.on("pedirCartas",function (data) {
             cli.manoInicial();
+            //iu.mostrarPasarTurno();
+			//iu.mostrarTablero();
+			//iu.mostrarRobarCarta();
+			//iu.mostrarAbandonarPartida();
+			//$("#mSalir").remove();
         });
         this.socket.on("mano",function (data) {
             console.log(data);
+            //iu.mostrarCartas(data);
         });
         this.socket.on("turno",function(data){
+			console.log(data);
+            //iu.mostrarCartaActual(data.cartaActual);
+			//iu.mostrarTurno(data.turno);
+		});
+        this.socket.on("final", function(data){
 			console.log(data);
 		});
         this.socket.on("fallo",function(data){

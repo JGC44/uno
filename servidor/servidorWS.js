@@ -6,6 +6,9 @@ function ServidorWS() {
     this.enviarATodos = function (io, codigo, mensaje, datos) {
         io.sockets.in(codigo).emit(mensaje, datos);
     }
+    this.enviarGlobal = function (socket, mens, datos) {
+		socket.broadcast.emit(mens, datos);
+	}
 
     //(Zona servidor del servidorWS)
     this.lanzarServidorWS = function (io, juego) {
@@ -65,7 +68,7 @@ function ServidorWS() {
                     var codigo = ju1.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
-                    cli.enviarAlRemitente(socket, "turno", { "turno": nickTurno, "cartaActual": partida.cartaActual });
+                    cli.enviarAlRemitente(socket, "turno", { turno: nickTurno, cartaActual: partida.cartaActual });
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario y/o la partida no existen");
                 }
@@ -78,10 +81,12 @@ function ServidorWS() {
                     var codigo = ju1.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
-                    cli.enviarATodos(socket, "turno", { "turno": nickTurno, "cartaActual": partida.cartaActual });
-
+                    if (ju1.mano.length == 1) {
+                        cli.enviarATodos(io, codigo, "Ultima Carta", { nick: ju1.nick });
+                    }
+                    cli.enviarATodos(socket, "turno", { turno: nickTurno, cartaActual: partida.cartaActual });
                     if (partida.fase.nombre == "final") {
-                        cli.enviarATodos(io, codigo, "final", { "ganador": nickTurno });
+                        cli.enviarATodos(io, codigo, "final", { ganador: nickTurno });
                     }
                 }
                 else {
@@ -107,7 +112,7 @@ function ServidorWS() {
                     var codigo = ju1.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
-                    cli.enviarATodos(socket, "turno", { "turno": nickTurno, "cartaActual": partida.cartaActual });
+                    cli.enviarATodos(socket, "turno", { turno: nickTurno, cartaActual: partida.cartaActual });
                 }
                 else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario y/o la partida no existen");
