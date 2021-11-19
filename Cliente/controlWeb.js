@@ -1,229 +1,292 @@
 function ControlWeb() {
+    //para la vista
+
+    //AGREGAR JUGADOR
+    this.mostrarTexto = function () {
+        var cadena = '<div id = "mT">'
+        cadena += '<p> Introduce tu nick para comenzar a jugar </p>'
+        cadena += '</div>'
+        $("#mostrarTexto").append(cadena);
+    }
+
     this.mostrarAgregarJugador = function () {
-        var cadena = '<div id="mAJ"><label for="usr">Nick:</label>';
-        cadena += '<input type="text" class="form-control" id="usr"></input>';
-        cadena += '<button type="button" id="btnAJ" class="btn btn-primary">Entrar</button>';
+        iu.mostrarTexto();
+        $('#mLP').remove()
+        //meter el html en una cadena 
+        //<label for="usr">Nick:</label>
+        var cadena = '<div id = "mAJ">';
+        cadena += '<input type="text" class="form-control" placeholder="Su nick" id="usr"></input>';
+        cadena += '<button type="button" id="btnAJ" class="btn btn-success">Entrar</button>'
+        cadena += "</div>"
+
+        //selector que busca aquel elemento html cuyo id sea el que se indica (si pones . en vez de # buscaria clases)
+        $("#agregarJugador").append(cadena);
+        $("#btnAJ").on("click", function () {
+            //codigo que controla el click sobre el boton cuyo id es btnAJ
+            var nick = $('#usr').val();
+
+            if (nick == "") {
+                iu.mostrarModal("Debes introducir un Nick")
+            } else {
+                $("#mAJ").remove(); //que desaparezca el formulario despues de introducir el nick
+                $("#mT").remove();
+                rest.agregarJugador(nick);
+            }
+        })
+    }
+
+    this.mostrarSalirPartida = function () {
+        var cadena = '<div id = "mSP">'
+        cadena += '<button type="button" id="btnSP" class="btn btn-danger">Salir</button>'
+        cadena += '</div>'
+        $('#salir').append(cadena);
+
+        $("#btnSP").on("click", function () {
+
+            //ws.nick = "";
+            ws.codigo = "";
+            $("#mM").remove();
+            $("#mCA").remove();
+            $("#mCP").remove();
+            $("#mEs").remove();
+            $("#mLP").remove();
+            $('#mTur').remove();
+            $('#mCod').remove();
+            $('#mR').remove();
+            $("#btnSP").remove();
+            $('#mCon').remove();
+
+            iu.mostrarAbandonarJuego();
+            iu.mostrarControl(ws.nick);
+            iu.mostrarCrearPartida(ws.nick);
+            rest.obtenerPartidasDisponibles();
+        })
+    }
+
+    this.mostrarAbandonarJuego = function () {
+        var cadena = '<div id = "mAbJ">'
+        cadena += '<button type="button" id="btnAbJ" class="btn btn-danger">Abandonar juego</button>'
+        cadena += '</div>'
+        $('#abandonar').append(cadena);
+
+        $("#btnAbJ").on("click", function () {
+            ws.codigo = "";
+            ws.nick = "";
+            $("#mCP").remove();
+            $("#mLP").remove();
+            $('#mCon').remove();
+            $('#btnAbJ').remove();
+            iu.mostrarAgregarJugador();
+        })
+    }
+
+    //mostrarTurno
+    this.mostrarTurno = function (nick) {
+        $('#mTur').remove();
+        var cadena = '<div id="mTur">'
+        // cadena += '<div class="card-body text-center">'
+        // cadena += '<p class="card-text">Turno</p>';
+        cadena += '<h6>Turno: </h6>' + nick;
+        cadena += '</div>'
+
+        $('#turno').append(cadena);
+    }
+
+    //CREAR PARTIDA
+    this.mostrarCrearPartida = function (nick) {
+        //iu.mostrarSalirPartida(); 
+        //necesita el nick y el numJug
+        var cadena = '<div id = "mCP"><h3 class="text-center">Crear Partida</h3>';
+        cadena += '<label for="numJug">Numero de jugadores:</label>'
+        cadena += '<select class="form-control" id="numJug">'
+        cadena += '<option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>'
+        cadena += "</select>"
+        cadena += '<button type="button" id="btnCP" class="btn btn-success">Crear partida</button>'
+        cadena += "</div>"
+
+        $("#crearPartida").append(cadena);
+        $("#btnCP").on("click", function () {
+            var numJug = $('#numJug').val();
+            $("#mCP").remove();
+            //iu.mostrarEsperando(); 
+            $('#mLP').remove();
+            ws.crearPartida(nick, numJug);
+            $('#mAbJ').remove();
+            iu.mostrarSalirPartida();
+        })
+    }
+
+    this.mostrarEsperando = function () {
+        var cadena = '<div id=mEs>'
+        cadena += '<button class="btn btn-primary" disabled>'
+        cadena += '<span class="spinner-grow spinner-grow-sm"></span>  Esperando jugadores  </button>'
+        cadena += '</div>'
+        $("#esperando").append(cadena);
+    }
+
+    this.mostrarCodigo = function (codigo) {
+        var cadena = '<div id="mCod">'
+        cadena += "Codigo: " + codigo;
+        cadena += '</div>'
+        $('#mostrarCodigo').append(cadena);
+    }
+
+    this.mostrarControl = function (nick) {
+        var cadena = '<div id="mCon">'
+        cadena += "Jugador: " + nick;
+        cadena += '</div>'
+        $('#mostrarControl').append(cadena);
+    }
+
+    //LISTA PARTIDAS (Aqui se une a la partida)
+    this.mostrarListaPartidas = function (lista) {
+
+        $('#mLP').remove() //borrar el formulario
+        var cadena = '<div class="list-group" id="mLP"><h3 class="text-center">Lista Partidas</h3>'
+
+        for (i = 0; i < lista.length; i++) {
+            var codigo = lista[i].codigo
+            cadena += ' <a href="#" class="list-group-item list-group-item-action" value ="' + codigo + '">' + codigo + '</a>';
+        }
+
         cadena += '</div>';
 
-        /*
-        var cadena = '<div id="mAJ">';
-        cadena = cadena + '<div class="input-group mb-3"><input type="text" class="form-control" id="usr"></input>';
-        cadena = cadena + '<div class="input-group-append"><button type="button" id="btnAJ" class="btn btn-primary">Entrar</button></div>';
-        cadena = cadena + '</div></div>';
-        */
+        $('#listaPartidas').append(cadena);
 
-        $("#agregarJugador").append(cadena);
-
-        $("#btnAJ").on("click",function () {
-            var nick=$("#usr").val();
-            if (nick == "") {
-                //si esta vacio
-                alert('Necesita introducir un nick');
-            }
-            else {
-                $("#mAJ").remove();
-                $("#texto1").remove();
-                rest.agregarJugador(nick);
-                rest.obtenerTodasPartidas();
-                //iu.mostrarNick(nick);
-                //iu.mostrarCrearPartida();
-                //iu.mostrarUnirAPartida();
-
+        $(".list-group a").click(function () {
+            codigo = $(this).attr("value");
+            var nick = ws.nick;
+            console.log(codigo + "" + nick);
+            if (codigo && nick) {
+                //$('#mLP').remove(); 
+                $('#mCP').remove();
+                iu.mostrarCodigo(codigo);
+                ws.unirAPartida(codigo, nick);
+                $('#mLP').remove();
+                $('#mSP').remove();
+                //iu.mostrarTurno();
+                $('#mAbJ').remove();
+                iu.mostrarSalirPartida();
             }
         });
     }
 
-    //this.mostrarCrearPartida
-    //this.mostrarUnirAPartida
-    //this.mostrarListaPartidas
-
-    this.mostrarCrearPartida = function () {
-        var cadena = '<div id="mCP"><h5 id="texto1">Crear partida</h5>';
-        cadena = cadena + '<div id="mCP"><label for="numJug">Numero de jugadores (2 a 8):</label></div>';
-        cadena = cadena + '<div class="input-group mb-3"><input type="number" class="form-control" id="numJug"></input>';
-        cadena = cadena + '<div class="input-group-append"><button type="button" id="btnCP" class="btn btn-primary">Crear</button></div>';
-        cadena = cadena + '</div></div>';
-
-        $("#crearPartida").append(cadena);
-
-        $("#btnCP").on("click", function () {
-            //click en crearPartida
-            var numJug = $('#numJug').val();
-            if (numJug == "") {
-                alert('Necesita introducir el número de jugadores');
-            }
-            else if (numJug < 2 || numJug > 8) {
-                $('#numJug').val("");
-                alert('Introduzca un número entre 2-8 jugadores');
-            }
-            else {
-                ws.crearPartida(numJug, nick);
-                $("#mCP").remove();
-                $("#mUAP").remove();
-                $("#mOTP").remove();
-                iu.paginaEspera();
-            }
-        })
-    }
-    this.mostrarCodigo = function (codigo) {
-        var cadena = '<div id="mC"><label for="mostrarCodigo">Codigo de la partida: ' + codigo + '</label>';
-        $("#mostrarCodigo").append(cadena);
-    };
-
-    this.paginaEspera = function(){
-        //Esta funcion es para cuando una persona crea una partida
-        //Y esta esperando a que gente se una
-        var cadena = '<div id="pE"><h5 id="texto1">Esperando a los jugadores</h5>';
-        cadena = cadena + '<br><div id="pE" class="spinner-border text-primary"></div>';
-        
-        $("#espera").append(cadena);
-    }
-    this.mostrarNick = function(nick){
-        var cadena = '<div id="mN"><h4>Jugador</h4>';
-        cadena = cadena + '<div id="mN"><label for="mostrarNick">Nick: ' + nick + '</label>';
-        this.nick=nick;
-
-        $("#mostrarNick").append(cadena);
+    this.mostrarModal = function (msg) {
+        //meter el msg en el modal (usar el mismo modal para muchas cosas)
+        $('#cM').remove();
+        var cadena = "<p id='cM'>" + msg + "</p>";
+        $('#contenidoModal').append(cadena);
+        $("#miModal").modal('show');
     }
 
-    //no se como hacer que se muestre el num
-    /*this.mostrarNumJug = function(){
-        var numJug= $('#numJug').val();
-        var cadena = '<div id="mNJ"><label for="mostrarNumJug">Numero de jugadores:' + numJug +'</label> ';
-        $("#mostrarNumJug").append(cadena);
-    }*/
+    this.mostrarMano = function (lista) {
+        $('#mM').remove();
+        //console.log(lista); 
 
+        var cadena = '<div class="list-group" id="mM">';
+        cadena += '<div class="card-columns">'
 
-   
-    this.mostrarUnirAPartida = function () {
-        var cadena = '<div id="mUAP"><h5 id="texto2">Unir a partida</h5>';
-        cadena = cadena + '<div id="mUAP"><label for="code">Introduzca el código de la partida:</label></div>';
-        cadena = cadena + '<div class="input-group mb-3"><input type="text" class="form-control" id="code"></input>';
-        cadena = cadena + '<div class="input-group-append"><button type="button" id="btnUAP" class="btn btn-primary">Unir</button></div>';
-        cadena = cadena + '</div></div>';
-
-        $("#unirAPartida").append(cadena);
-
-        $("#btnUAP").on("click", function () {
-            //click en mostrarPartida
-            var code = $('#code').val();
-            console.log(code);
-            if (code == "") {
-                alert('Necesita introducir el codigo de la partida');
-            }
-            else {
-                ws.unirAPartida(code, nick);
-                $("#mCP").remove();
-                $("#mUAP").remove();
-                $("#mOTP").remove();
-                iu.paginaEspera();
-                iu.mostrarCodigo(code);
-            }
-        })
-    }
-
-    this.mostrarCartas = function (lista){
-        $("#espera").remove();
-        $("#mCartas").remove();
-
-        var cadena = '<div class="list-group" id="mCartas">';
-        cadena = cadena + '<div class="card-columns">';
-        
         for (i = 0; i < lista.length; i++) {
-            cadena = cadena + '<div class="card bg-light" style="width:200px">';
-            cadena = cadena + '<div class="card-body text-center">';
-            cadena = cadena + '<a href="#" value="'+ i +'" class="list-group-item list-group-item-action">';
-            cadena = cadena + '<img class="card-img-top" src="cliente/img/'+lista[i].nombre+'.png"></img>';
-            cadena = cadena + '</a></div></div>';
+            var carta = lista[i].img + ".png"
+            cadena += '<div class ="card bg-light">'
+            cadena += '<div class="card-body text-center">'
+            cadena += '<a href="#" value="' + i + '" class="list-group-item list-group-item-action">';
+            //cadena += '<img class="card-img-top" src="cliente/img/'+lista[i].nombre +'.png" alt="Card image">'
+            cadena += '<p class="card-text">' + lista[i].tipo + ' ' + lista[i].color + ' ' + lista[i].valor + '</p>';
+            cadena += '</div></div>';
         }
 
-        cadena = cadena + '</div></div></div>';
+        cadena += '</div>';
+        $('#mano').append(cadena);
 
-        $("#mano").append(cadena);
-
+        //on click
         $(".list-group a").click(function () {
-            var number=-1;
+            var number = -1;
             number = $(this).attr("value");
-            if (number!=-1) {
+            if (number != -1) {
                 ws.jugarCarta(number);
+
             }
         })
     }
-
-    this.mostrarTurno = function (nickTurno) {
-        $("#mTurno").remove();
-
-        var cadena = '<div id="mTurno"><h6>Turno: </h6>' + nickTurno +'</div>';
-
-        $("#mostrarTurno").append(cadena);
-    };
-
-    this.mostrarPasarTurno = function () {
-        var cadena = '<div id="mPT"><button type="button" id="btnPT" class="btn btn-dark">Pasar turno</button>';
-
-        $("#pasarTurno").append(cadena);
-
-        $("#btnPT").on("click", function () {
-            ws.pasarTurno();
-        })
-
-    };
-
-    this.mostrarCartaActual=function(carta){
-
-        $("#mCA").remove();
-
-        var cadena ='<div class="card-columns" id="mCA">';
-        
-            cadena = cadena + '<div class="card bg-light">';
-            cadena = cadena + '<div class="card-body text-center">';
-            cadena = cadena + '<p class="card-text"><span style="font-weight:bold">CARTA ACTUAL</span><br>Tipo: '+carta.tipo+'<br>Color: '
-            +carta.color+'<br>Valor: '+carta.valor+'</p>';
-            cadena = cadena + '</div></div>';
-
-        cadena = cadena + '</div>';
-
-        $("#cartaActual").append(cadena);
-    }
-    this.mostrarTablero = function(){
-        var tabl = '<div id="mTABLERO"><h1>TABLERO UNO</h1></div>';
-        $("#tablero").append(tabl);
-    }
-
-    //falta mostrarRobarCarta, mostrarSalir, mostrarAbandonarPartida
-   
-    this.mostrarObtenerTodasPartidas = function(lista){
-        $("#mOTP").remove();
-
-        var cadena = '<div id="mOTP"><h5>Partidas disponibles:</h5>';
-        cadena = cadena + '<ul class="list-group">';
-        for (i = 0; i < Object.keys(lista).length; i++) {
-            cadena = cadena + '<a href="#" class="list-group-item list-group-item-action" value="' + lista[i].codigo + '">Codigo: ' + lista[i].codigo + ' || Dueño: ' + lista[i].propietario + '</a>';
+    /*
+        this.mostrarMano = function(lista) {
+            $("#mM").remove()
+            var cadena = `
+            <div id="mM" class="card-columns row">`
+            
+            for (var i = 0; i<lista.length; i++) {
+                var carta = lista[i].img+".png"
+                cadena += `
+                <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
+                    <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/`+carta+`" alt=""></a>
+                </div>`
+            }
+            cadena += '</div>'
+            $("#mano").append(cadena)
         }
-        cadena = cadena + '</ul>';
-        cadena = cadena + '</div>';
+    */
+    this.mostrarRobar = function () {
+        var cadena = '<div id="mR"><button type="button" id="btnR" class="btn btn-primary">Robar</button>';
 
-        $("#listaPartidas").append(cadena);
+        $("#robar").append(cadena);
 
-        $(".list-group a").click(function () {
-            code = $(this).attr("value");
-            var nick = ws.nick;
-            console.log(code + " " + nick);
-            if (code && nick) {
-                ws.unirAPartida(code, nick);
-                $("#mCP").remove();
-                $("#mUAP").remove();
-                $("#mOTP").remove();
-                iu.paginaEspera();
-                iu.mostrarCodigo(code);
-            }
+        $("#btnR").on("click", function () {
+            ws.robarCarta(1);
         })
+
+    };
+
+    //abandonar partida
+
+    this.mostrarCartaActual = function (carta) {
+        $('#mCA').remove();
+        $('#mEs').remove();
+        $('#mLP').remove();
+        var cadena = '<div id="mCA" class="card-columns">';
+
+        cadena += '<div class ="card bg-light">'
+        cadena += '<div class="card-body text-center">'
+        //cadena += '<img class="card-img-top" src="cliente/img/'+carta.nombre +'.png" alt="Card image">'
+        cadena += '<p class="card-text">' + carta.tipo + ' ' + carta.color + ' ' + carta.valor + '</p>';
+        cadena += '</div></div>';
+
+        cadena += '</div>';
+        $('#actual').append(cadena);
+    }
+/*
+    his.mostrarRivales=function(data){
+		$('#mLR').remove();
+		var cadena="<div id='mLR'><h3>Rivales:</h3>";
+		for(i=0;i<data.length;i++){
+			if (data[i]!=ws.nick){
+				cadena=cadena+'<div class="card">';
+	  			cadena=cadena+'<div class="card-body">';
+	    		cadena=cadena+'<p class="card-title">Rival:</p>';
+		    	cadena=cadena+'<p class="card-text">Nick: '+data[i]+'</p>';
+	    		//cadena=cadena+'<a href="#" class="btn btn-primary">Otros</a>';
+	  			cadena=cadena+'</div></div>';
+	  		}
+		}
+		$('#rivales').append(cadena);
+*/
+    this.limpiar = function () {
+        $("#mT").remove();
+        $("#mAJ").remove();
+        $("#btnAJ").remove();
+        $("#mSP").remove();
+        $("#btnSP").remove();
+        $("#mAbJ").remove();
+        $("#mTur").remove();
+        $("#mCP").remove();
+        $("#mEs").remove();
+        $("#mCod").remove();
+        $("#mCon").remove();
+        $('#mLP').remove();
+        $('#cM').remove();
+        $('#mM').remove();
+        $('#mR').remove();
+        $('#mCA').remove();
     }
     
-    this.mostrarModal=function(msg){
-        $("#mM").remove();
-        var cadena = '<p id="mM">'+msg+'</p>';
-        $("#contenidoModal").append(cadena);
-        $('#myModal').modal('show');
-    }
 }

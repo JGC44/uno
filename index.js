@@ -22,82 +22,86 @@ app.get("/", function (request, response) {
     response.send(contenido);
 });
 
-//agregar Usuario
 app.get("/agregarJugador/:nick", function (request, response) {
     var nick = request.params.nick;
     var res = juego.agregarJugador(nick);
     response.send(res);
 });
 
-//crear partida
-app.get("/crearPartida/:num/:nick", function (request, response) {
+app.get("/crearPartida/:nick/:numJug", function (request, response) {
     var nick = request.params.nick;
-    var num = request.params.num;
-    var ju = juego.usuarios[nick];
+    var numJug = request.params.numJug;
+    var jugador = juego.usuarios[nick]
     var res = { codigo: -1 };
-    if (ju) {
-        var partida = ju.crearPartida(num);
-        console.log("Nueva partida de " + nick + " codigo: " + ju.codigoPartida);
-        res.codigo = ju.codigoPartida;
+    if (jugador) {
+        var partida = jugador.crearPartida(numJug);
+        console.log("Nueva partida de " + nick + " codigo: " + jugador.codigoPartida);
+        res.codigo = jugador.codigoPartida;
     }
     response.send(res);
 })
 
-//unir a partida (Error)
 app.get("/unirAPartida/:codigo/:nick", function (request, response) {
-    var nick = request.params.nick;
     var codigo = request.params.codigo;
-    var ju2 = juego.usuarios[nick];
+    var nick = request.params.nick;
+    var jugador = juego.usuarios[nick];
+    var partida = juego.partidas[codigo];
+
     var res = { codigo: -1 };
-    // if (ju2)
-    if (juego.partidas[codigo] && (!juego.partidas[codigo].jugadores[nick])) {
-        ju2.unirAPartida(codigo);
-        console.log("Jugador de " + nick + " se ha unido a la partida de codigo: " + ju.codigoPartida);
-        //res.code=500; //si funciona bien
-        res.codigo = ju.codigoPartida;
+    if (partida) {
+        partida.unirAPartida(jugador);
+        res.codigo = jugador.codigoPartida;
     }
     response.send(res);
 })
 
-//obtener lista de partidas
-app.get("/obtenerListaPartidas",function(request,response){
-	if (juego){
-		var lista=juego.obtenerTodasPartidas();
-		response.send(lista);
-	}
-});
+app.get("/obtenerTodasPartidas", function (request, response) {
+    var lista = []
+
+    for (each in juego.partidas) {
+        var partida = juego.partidas[each]
+        lista.push({ propietario: partida.propietario, codigo: each })
+    }
+    response.send(lista);
+})
+
+app.get("/obtenerPartidasDisponibles", function (request, response) {
+
+    if (juego) {
+        var lista = juego.obtenerPartidasDisponibles();
+        response.send(lista);
+    }
+})
+
+app.get("/obtenerTodosResultados", function (request, response) {
+    if (juego) {
+        juego.obtenerTodosResultados(function (lista) {
+            response.send(lista);
+        })
+    }
+})
+
+app.get("obtenerResultados/:nick", function (request, response) {
+    var nick = request.params.nick;
+    if (juego) {
+        juego.obtenerResultados({ ganador: nick }, function (lista) {
+            response.send(lista);
+        })
+    }
+})
+
+app.get("/cerrarSesion/:nick", function (request, response) {
+    var nick = request.params.nick;
+    var jugador = juego.usuarios[nick];
+    if (jugador) {
+        jugador.cerrarSesion();
+        response.send({ res: "ok" });
+    }
+})
 
 http.listen(app.get('port'), function () {
-    console.log("La app NodeJS se esta ejecutando en el puerto", app.get("port"));
-});
+    console.log("La app NodeJS se esta ejecutando en el puerto ", app.get("port"));
+}) //el listen siempre tiene que estar el ultimo
 
-//jugar carta
-app.get("/jugarCarta/:nick/:numero", function (request, response) {
-    var nick = request.params.nick;
-    var numeroCarta = request.params.numero;
-    var jugador = juego.usuarios[nick];
-
-    var res ={code:-1};
-    if (jugador.mano.length!=0){
-        jugador.jugarCarta(numeroCarta);
-        res.code=500;//si funciona bien
-    }
-    response.send(res);
-})
-
-//robar cartas
-app.get("/robar/:nick/:numero", function (request, response) {
-    var nick = request.params.nick;
-    var cartasARobar = request.params.numero;
-    var jugador = juego.usuarios[nick];
-
-    var res ={code:-1};
-    if (jugador.mano){//no se que poner
-        jugador.robar(cartasARobar);
-        res.code=500;
-    }
-    response.send(res);
-})
-
-//lanzar el servidor de WS
+//lanzar el servidor de web socket 
 servidorWS.lanzarServidorWS(io, juego);

@@ -15,10 +15,11 @@
   "bugs": {
     "url": "https://github.com/JGC44/uno/issues"
   },
-  "homepage": "https://github.com/JGC44/uno#readme",
+  "homepage": "https://jgc44.github.io/uno/",
   "dependencies": {
     "express": "^4.17.1",
     "jasmine-node": "^3.0.0",
+    "mongodb": "^4.2.0",
     "socket.io": "^4.3.1"
   }
 }
