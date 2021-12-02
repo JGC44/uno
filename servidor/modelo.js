@@ -96,7 +96,7 @@ function Juego() {
 
     this.registrarUsuario = function (email, clave, cb) {
         var ju = this;
-        var claveCifrada = cf.encryptStr(clave, 'sEcrEtA');
+        var claveCifrada = cf.encryptStr(clave, 'sEcrEt');
         var nick = email;
 
         this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
@@ -111,21 +111,27 @@ function Juego() {
         })
     }
 
-
     this.loginUsuario = function (email, clave, cb) {
         var ju = this;
         var nick = email;
         this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
-            var clavedesCifrada = cf.decryptStr(usr.clave, 'sEcrEtA');
-            if (usr && clave == clavedesCifrada) {
-                cb(usr);
-                ju.agregarJugador(usr.nick);
+            if (usr) {
+                var clavedesCifrada = cf.decryptStr(usr.clave, 'cLaVeSecrEtA');
+                if (clave == clavedesCifrada) {
+                    cb(null, usr);
+                    ju.agregarJugador(usr.nick);
+                    console.log("Usuario inicia sesión")
+                }
+                else {
+                    cb(null)
+                }
             }
             else {
-                cb({ nick: "nook" })
+                cb(null)
             }
         })
     }
+
 
     //Esto se ejecuta al crear el objeto juego
     this.cad.conectar(function () {
@@ -506,7 +512,7 @@ function Derecha() {
     }
     //falta
 
-    
+
 }
 
 function Izquierda() {

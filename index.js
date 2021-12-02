@@ -124,6 +124,25 @@ app.get("/cerrarSesion/:nick", function (request, response) {
     }
 })
 
+app.post('/registrarUsuario', function (request, response) {
+    var email = request.body.email;
+    var clave = request.body.clave;
+
+    juego.registrarUsuario(email, clave, function (data) {
+        response.send(data);
+    });
+})
+
+app.post('/loginUsuario', function (request, response) {
+    var email = request.body.email;
+    var clave = request.body.clave;
+
+    juego.loginUsuario(email, clave, function (data) {
+        response.send(data);
+    });
+})
+
+
 http.listen(app.get('port'), function () {
     console.log("La app NodeJS se esta ejecutando en el puerto ", app.get("port"));
 }) //el listen siempre tiene que estar el ultimo
