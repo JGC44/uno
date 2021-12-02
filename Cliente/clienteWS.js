@@ -35,6 +35,14 @@ function ClienteWS() {
         this.socket.emit("pasarTurno", this.nick);
     }
 
+    this.abandonarPartida = function () {
+        this.socket.emit("abandonarPartida", this.nick);
+    }
+
+    this.cerrarSesion = function () {
+        this.socket.emit("cerrarSesion", this.nick);
+    }
+
     //Espera de respuestas, a la escucha (Zona servidor del clienteWS)
     this.servidorWSCliente = function () {
         var cli = this;
@@ -78,10 +86,10 @@ function ClienteWS() {
             iu.mostrarTurno(data.turno);
         })
         /*
-                this.socket.on("final", function (data) {
-                    ws.codigo = "";
-                    iu.mostrarModal("¡¡" + data.ganador + " ha ganado la partida!!");
-                })
+        this.socket.on("final", function (data) {
+            ws.codigo = "";
+            iu.mostrarModal("¡¡" + data.ganador + " ha ganado la partida!!");
+        })
         */
         this.socket.on("final", function (data) {
             if (data.ganador == cli.nick) {
@@ -97,21 +105,22 @@ function ClienteWS() {
         this.socket.on("fallo", function (data) {
             console.log(data);
         })
-        /*
+
         this.socket.on("jugadorAbandona", function (data) {
-                    ui.mostrarModal("Un jugador ha abandonado la partida");
-                    ui.limpiar();
-                    ui.mostrarHome({nick:cli.nick});
-                    cli.codigo="";
-                });
-                this.socket.on("usuaruioEliminado", function (data) {
-                    cli.nick="";
-                    cli.codigo="";
-                    $.removeCookie("nick");
-                    ui.limpiar();
-                    ui.mostrarAgregarJugador();
-                });
-        */
+            ui.mostrarModal("Un jugador ha abandonado la partida");
+            ui.limpiar();
+            ui.mostrarHome({ nick: cli.nick });
+            cli.codigo = "";
+        });
+        
+        this.socket.on("usuaruioEliminado", function (data) {
+            cli.nick = "";
+            cli.codigo = "";
+            $.removeCookie("nick");
+            ui.limpiar();
+            ui.mostrarAgregarJugador();
+        });
+
     }
     this.conectar();
 }

@@ -151,6 +151,9 @@
     iu = new ControlWeb();
     iu.mostrarAgregarJugador();
     //iu.comprobarUsuario();
+    if($.cookie("nick")) {
+        iu.comprobarUsuario()
+    }
   </script>
 </body>
 

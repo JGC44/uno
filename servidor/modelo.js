@@ -59,7 +59,6 @@ function Juego() {
         }
     }
 
-
     this.obtenerCodigo = function () {
         let cadena = "ABCDEFGHIJKLMNOPQRSTUVXYZ";
         let letras = cadena.split('');
@@ -73,6 +72,10 @@ function Juego() {
 
     this.numeroPartidas = function () {
         return Object.keys(this.partidas).length;
+    }
+
+    this.borrarUsuario = function (nick) {
+        delete this.usuarios[nick];
     }
 
     this.obtenerTodosResultados = function (callback) {
@@ -91,11 +94,43 @@ function Juego() {
         })
     }
 
+    this.registrarUsuario = function (email, clave, cb) {
+        var ju = this;
+        var claveCifrada = cf.encryptStr(clave, 'sEcrEtA');
+        var nick = email;
+
+        this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
+            if (!usr) {
+                ju.cad.insertarUsuario({ email: email, clave: claveCifrada, nick: nick }, function (usu) {
+                    cb({ email: 'ok' });
+                })
+            }
+            else {
+                cb({ email: "nook" })
+            }
+        })
+    }
+
+
+    this.loginUsuario = function (email, clave, cb) {
+        var ju = this;
+        var nick = email;
+        this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
+            var clavedesCifrada = cf.decryptStr(usr.clave, 'sEcrEtA');
+            if (usr && clave == clavedesCifrada) {
+                cb(usr);
+                ju.agregarJugador(usr.nick);
+            }
+            else {
+                cb({ nick: "nook" })
+            }
+        })
+    }
+
     //Esto se ejecuta al crear el objeto juego
     this.cad.conectar(function () {
 
     })
-
 }
 
 function randomInt(low, high) {
@@ -108,6 +143,7 @@ function Jugador(nick, juego) {
     this.mano = [];
     this.codigoPartida;
     this.puntos = 0;
+    this.estado = new Normal();
 
     this.crearPartida = function (numJug) {
         return this.juego.crearPartida(nick, numJug);
@@ -165,11 +201,48 @@ function Jugador(nick, juego) {
         }
     }
 
+    this.abandonarPartida = function () {
+        var partida = this.obtenerPartida(this.codigoPartida);
+        partida.fase = new Final();
+    }
+
+    this.cerrarSesion = function () {
+        this.juego.borrarUsuario(this.nick);
+    }
+
     this.insertarResultado = function (prop, numJug) {
         var resultado = new Resultado(prop, this.nick, this.puntos, numJug);
         this.juego.insertarResultado(resultado);
     }
+
+    /*
+    this.recibeTurno=function(partida){
+        this.estado.recibeTurno(partida,this);
+    }
+    */
+
+    this.bloquear = function () {
+        jugador.estado = new Bloqueado();
+    }
 }
+
+function Normal() {
+    this.nombre = "normal"
+    this.recibeTurno = function (partida, jugador) {
+        partida.jugadorPuedeJugar(jugador);
+    }
+
+}
+
+function Bloqueado() {
+    this.nombre = "bloqueado"
+    this.recibeTurno = function (partida, jugador) {
+        jugador.pasarTurno();
+        jugador.estado = new Normal();
+
+    }
+}
+
 
 function Partida(codigo, jugador, numJug) {
     this.codigo = codigo;
@@ -360,6 +433,13 @@ function Partida(codigo, jugador, numJug) {
         this.turno.puntos = suma;
     }
 
+    this.bloquearSiguiente = function () {
+        //obtener quie es el siguiente jugador (Dirección)
+        var jugador = this.direccion.obtenerSiguiente(this);
+        //y bloquearlo
+        jugador.bloquear();
+    }
+
     this.crearMazo();
     this.unirAPartida(jugador);
 }
@@ -424,6 +504,9 @@ function Derecha() {
         var siguiente = (indice + 1) % (Object.keys(partida.jugadores).length);
         partida.turno = partida.jugadores[partida.ordenTurno[siguiente]];
     }
+    //falta
+
+    
 }
 
 function Izquierda() {
@@ -463,7 +546,7 @@ function Bloqueo(valor, color) {
     this.valor = valor;
     this.color = color;
     this.comprobarEfecto = function (partida) {
-
+        //partida.bloquearSiguiente();
     }
 }
 

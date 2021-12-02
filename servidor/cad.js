@@ -34,8 +34,12 @@ function CAD() {
         })
     }
 
+    this.insertarResultado = function (resultado, callback) {
+        insertar(this.resultadosCol, resultado, callback);
+    }
+
     function insertar(collection, objeto, callback) {
-        collection.insertOne(objeto, function (err, datos) {
+        collection.insertOne(objeto, function (err, resultado) {
             if (err) {
                 console.log("No se ha podido insertar elementos");
             } else {
@@ -45,24 +49,31 @@ function CAD() {
         })
     }
 
-    this.insertarResultado = function (resultado, callback) {
-        insertar(this.resultadosCol, resultado, callback);
-    }
-
     //Metodos de las colecciones
-
+ 
     this.conectar = function (callback) {
-        var pers = this;
+        var cad = this;
         mongo.connect("mongodb+srv://patata:patata@cluster0.0ch8k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", function (err, db) {
             if (err) {
                 console.log("No se puede conectar")
             }
             else {
                 console.log("Conectando a Atlas MongoDB")
-                CAD.resultadosCol = db.db("unoDB1").collection("resultados");  //CAD con mayuscula?
+                cad.resultadosCol = db.db("unoDB1").collection("resultados");  //CAD con mayuscula?
             }
         })
     }
+
+    function encontrarCriterio(coleccion, criterio,callback){
+		coleccion.find(criterio).toArray(function(err,usr){
+			if (usr.length==0){
+                callback(undefined);
+            }
+            else{
+                callback(usr[0]);
+            }
+		})
+	}
 
     //
 }

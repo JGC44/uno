@@ -2,9 +2,13 @@ var fs = require("fs");
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
+
 var { Server } = require("socket.io");
 var io = new Server(http);
+
 var bodyParser = require("body-parser");
+//var passport = require("passport");
+//var cookieSession = require("cookie-session");
 
 var modelo = require("./servidor/modelo.js");
 var ssrv = require("./servidor/servidorWS.js");
@@ -15,6 +19,27 @@ var servidorWS = new ssrv.ServidorWS();
 app.set('port', process.env.PORT || 5000);
 
 app.use(express.static(__dirname + "/"));
+/*
+app.use(cookieSession({
+    name:'unocartas', //nombre de la cookie
+    keys:["key1","key2"]
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
+
+const haIniciado = function (request, response, next) {
+    if (request.user) {
+        next();
+    }
+    else {
+        response.redirect("/");
+    }
+}
+*/
 
 app.get("/", function (request, response) {
     var contenido = fs.readFileSync(__dirname + "/cliente/index.html");

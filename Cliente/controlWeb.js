@@ -1,6 +1,18 @@
 function ControlWeb() {
     //para la vista
 
+    //Cookies
+    this.comprobarUsuario = function () {
+        if ($.cookie("nick")) {
+            ws.nick = $.cookie("nick");
+            //iu.mostrarHome({nick:ws.nick});
+            iu.mostrarLobby();
+        } else {
+            iu.mostrarAgregarJugador();
+        }
+
+    }
+
     //AGREGAR JUGADOR
     this.mostrarTexto = function () {
         var cadena = '<div id = "mT">'
@@ -183,6 +195,7 @@ function ControlWeb() {
         $('#mM').remove();
         //console.log(lista); 
 
+
         var cadena = '<div class="list-group" id="mM">';
         cadena += '<div class="card-columns">'
 
@@ -191,10 +204,21 @@ function ControlWeb() {
             cadena += '<div class ="card bg-light">'
             cadena += '<div class="card-body text-center">'
             cadena += '<a href="#" value="' + i + '" class="list-group-item list-group-item-action">';
-            //cadena += '<img class="card-img-top" src="cliente/img/'+lista[i].nombre +'.png" alt="Card image">'
             cadena += '<p class="card-text">' + lista[i].tipo + ' ' + lista[i].color + ' ' + lista[i].valor + '</p>';
             cadena += '</div></div>';
         }
+
+        /*
+                var cadena = '<div id="mM" class="card-columns row">'
+                
+                for (var i = 0; i<lista.length; i++) {
+                    var carta = lista[i].img+".png"
+                    cadena += `
+                    <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
+                        <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/cartas`+carta+`" alt=""></a>
+                    </div>`
+                }
+        */
 
         cadena += '</div>';
         $('#mano').append(cadena);
@@ -209,23 +233,7 @@ function ControlWeb() {
             }
         })
     }
-    /*
-        this.mostrarMano = function(lista) {
-            $("#mM").remove()
-            var cadena = `
-            <div id="mM" class="card-columns row">`
-            
-            for (var i = 0; i<lista.length; i++) {
-                var carta = lista[i].img+".png"
-                cadena += `
-                <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
-                    <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/`+carta+`" alt=""></a>
-                </div>`
-            }
-            cadena += '</div>'
-            $("#mano").append(cadena)
-        }
-    */
+
     this.mostrarRobar = function () {
         var cadena = '<div id="mR"><button type="button" id="btnR" class="btn btn-primary">Robar</button>';
 
@@ -254,22 +262,23 @@ function ControlWeb() {
         cadena += '</div>';
         $('#actual').append(cadena);
     }
-/*
+    /*
     his.mostrarRivales=function(data){
-		$('#mLR').remove();
-		var cadena="<div id='mLR'><h3>Rivales:</h3>";
-		for(i=0;i<data.length;i++){
-			if (data[i]!=ws.nick){
-				cadena=cadena+'<div class="card">';
-	  			cadena=cadena+'<div class="card-body">';
-	    		cadena=cadena+'<p class="card-title">Rival:</p>';
-		    	cadena=cadena+'<p class="card-text">Nick: '+data[i]+'</p>';
-	    		//cadena=cadena+'<a href="#" class="btn btn-primary">Otros</a>';
-	  			cadena=cadena+'</div></div>';
-	  		}
-		}
-		$('#rivales').append(cadena);
-*/
+        $('#mLR').remove();
+        var cadena="<div id='mLR'><h3>Rivales:</h3>";
+        for(i=0;i<data.length;i++){
+            if (data[i]!=ws.nick){
+                cadena=cadena+'<div class="card">';
+                    cadena=cadena+'<div class="card-body">';
+                cadena=cadena+'<p class="card-title">Rival:</p>';
+                cadena=cadena+'<p class="card-text">Nick: '+data[i]+'</p>';
+                //cadena=cadena+'<a href="#" class="btn btn-primary">Otros</a>';
+                    cadena=cadena+'</div></div>';
+                }
+        }
+        $('#rivales').append(cadena);
+    */
+    /*
     this.limpiar = function () {
         $("#mT").remove();
         $("#mAJ").remove();
@@ -288,5 +297,5 @@ function ControlWeb() {
         $('#mR').remove();
         $('#mCA').remove();
     }
-    
+    */
 }

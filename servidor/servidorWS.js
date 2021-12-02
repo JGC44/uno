@@ -126,7 +126,7 @@ function ServidorWS() {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
             })
-/*
+
             socket.on("abandonarPartida", function (nick) {
                 var ju1 = juego.usuarios[nick];
                 if (ju1) {
@@ -149,7 +149,7 @@ function ServidorWS() {
                     cli.enviarAlRemitente(socket, "usuarioEliminado", {});
                 }
             })
-            */
+
         })
     }
 }

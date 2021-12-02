@@ -6,6 +6,7 @@ function ClienteRest() {
 
             if (data.nick != -1) {
                 ws.nick = data.nick;
+                // $.cookie("nick",data.nick);
                 iu.mostrarAbandonarJuego();
                 iu.mostrarControl(data.nick)
                 iu.mostrarCrearPartida(data.nick);
@@ -46,7 +47,7 @@ function ClienteRest() {
         })
     }
 
-    /*
+    ////
     this.jugarCarta = function (nick, numero) {
         $.getJSON("/jugarCarta/" + nick +"/"+ numero, function (data) {
             console.log(data);
@@ -77,7 +78,7 @@ function ClienteRest() {
         cadena=cadena+'<p>Nick: '+data.nick+'<p>';
         cadena=cadena+'</div>';
     }
-    */
+    ////
 
     this.obtenerTodosResultados = function () {
         $.getJSON("/obtenerTodosResultados", function (data) {
@@ -91,5 +92,24 @@ function ClienteRest() {
             console.log(data);
             //iu.mostrarListaResultados(data);
         })
+    }
+
+    this.registrarUsuario=function(email,clave){
+		$.ajax({
+			type:'POST',
+			url:'/registrarUsuario',
+			data:{"email":email,"clave":clave},
+			success:function(data){
+				if (data.email){
+					//mostrarLogin
+					console.log(data.email);
+				}
+				else{
+					console.log("No se ha podido registrar")
+				}
+			},
+			//contentType:'application/json',
+			dataType:'json'
+		});
     }
 }
