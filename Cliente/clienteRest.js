@@ -1,16 +1,67 @@
 function ClienteRest() {
+    //new
+    this.registrarUsuario=function(email,clave){
+		$.ajax({
+			type:'POST',
+			url:'/registrarUsuario',
+			data:JSON.stringify({"email":email,"clave":clave}),
+			success:function(data){
+				if (data.email){
+					//mostrarLogin
+					console.log("Registro con exito: " + data.email);
+				}
+				else{
+					iu.mostrarModal("No se ha podido registrar");
+				}
+			},
+			contentType:'application/json',
+			dataType:'json'
+		});
+	}
+
+    this.loginUsuario = function (email, clave) {
+        $.ajax({
+            type: 'POST',
+            url: '/loginUsuario',
+            data: JSON.stringify({ "email": email, "clave": clave }),
+            success: function (data) {
+                if (data.nick != "nook") {
+                    //mostrarLogin
+                    console.log("Inicio de sesion exitoso: " + data.email);
+                    ws.nick = data.nick;
+                    iu.mostrarHome();
+                    $.cookie("nick",data.nick);
+
+
+                } else {
+                    console.log(data);
+                    console.log("Usuario  o clave incorrecta");
+                    iu.mostrarModal("Usuario o clave incorrecta");
+                    iu.mostrarInicio();
+                }
+            },
+            contentType: 'application/json',
+            dataType: 'json'
+        });
+    };
+
     this.agregarJugador = function (nick) {
-        $.getJSON("/agregarJugador/" + nick, function (data) {
+        var cli = this;
+        //$.getJSON("/agregarJugador/" + nick, function (data) {
+        $.getJSON("/auth/google", function (data) {
             //se ejecuta cuando contesta el servidor
             console.log(data);
 
             if (data.nick != -1) {
                 ws.nick = data.nick;
-                // $.cookie("nick",data.nick);
+                $.cookie("nick",ws.nick);
+                iu.mostrarHome(data);
+                /*
                 iu.mostrarAbandonarJuego();
                 iu.mostrarControl(data.nick)
                 iu.mostrarCrearPartida(data.nick);
                 rest.obtenerPartidasDisponibles();
+                */
             } else {
                 iu.mostrarModal("El nick " + nick + " ya está en uso.");
                 iu.mostrarAgregarJugador()
@@ -20,9 +71,35 @@ function ClienteRest() {
         //mostrar un reloj, temporizado, cargando, etc
     }
 
+    //new
+    this.eliminarUsuario=function(clave){
+		var nick=$.cookie("nick");
+		$.ajax({
+			type:"DELETE",
+			url:"/eliminarUsuario/"+nick,
+			data:{clave:clave},
+			success:function(data){
+				if (data.res==1){
+					$.removeCookie("nick");
+					iu.limpiar();
+					iu.mostrarLogin();
+				}
+				else{
+                    iu.limpiar();
+					console.log("No se pudo eliminar usuario");
+                    iu.mostrarPerfil();
+				}
+			},
+			//contentType:"application/json",
+			dataType:"json"
+		});
+	}
+
     this.crearPartida = function (nick, numJ) {
         $.getJSON("/crearPartida/" + nick + "/" + numJ, function (data) {
             console.log(data);
+            ws.codigo=data.codigo;
+            iu.mostrarCodigo(data.codigo);
         })
     }
 
@@ -33,10 +110,12 @@ function ClienteRest() {
         })
     }
 
+    //obtenerlistapartidas
     this.obtenerTodasPartidas = function () {
         $.getJSON("/obtenerTodasPartidas", function (data) {
             console.log(data);
-            iu.mostrarListaPartidas(data);
+            iu.mostrarObtenerTodasPartidas(data);
+            //iu.mostrarListaPartidas(data);
         })
     }
 
@@ -47,15 +126,15 @@ function ClienteRest() {
         })
     }
 
-    ////
+    
     this.jugarCarta = function (nick, numero) {
-        $.getJSON("/jugarCarta/" + nick +"/"+ numero, function (data) {
+        $.getJSON("/jugarCarta/" + nick + "/" + numero, function (data) {
             console.log(data);
         });
     }
 
     this.robarCarta = function (nick, numero) {
-        $.getJSON("/robarCarta/" + nick +"/"+ numero, function (data) {
+        $.getJSON("/robarCarta/" + nick + "/" + numero, function (data) {
             console.log(data);
         });
     }
@@ -66,50 +145,49 @@ function ClienteRest() {
         });
     }
 
-    this.mostrarJuego = function(){
-        $.getJSON("/mostrarJuego",function(data){
+    /*
+    this.mostrarJuego = function () {
+        $.getJSON("/mostrarJuego", function (data) {
             console.log(data);
         });
     }
-    
-    this.mostrarControl=function(data,num){
+
+    this.mostrarControl = function (data, num) {
         $('#mC').remove();
         var cadena = '<div id="mC"><h4>Jugador<h4>';
-        cadena=cadena+'<p>Nick: '+data.nick+'<p>';
-        cadena=cadena+'</div>';
+        cadena = cadena + '<p>Nick: ' + data.nick + '<p>';
+        cadena = cadena + '</div>';
     }
-    ////
+    */
 
+    //new (BBDD)
     this.obtenerTodosResultados = function () {
         $.getJSON("/obtenerTodosResultados", function (data) {
             console.log(data);
+            iu.todosResultados(data);
+            iu.mostrarVolver();
             //iu.mostrarListaResultados(data);
         })
     }
 
     this.obtenerResultados = function (nick) {
-        $.getJSON("/obtenerResultados/"+nick, function (data) {
+        $.getJSON("/obtenerResultados/" + nick, function (data) {
             console.log(data);
             //iu.mostrarListaResultados(data);
         })
     }
 
-    this.registrarUsuario=function(email,clave){
-		$.ajax({
-			type:'POST',
-			url:'/registrarUsuario',
-			data:{"email":email,"clave":clave},
-			success:function(data){
-				if (data.email){
-					//mostrarLogin
-					console.log(data.email);
-				}
-				else{
-					console.log("No se ha podido registrar")
-				}
-			},
-			//contentType:'application/json',
-			dataType:'json'
-		});
+    this.abandonarPartida = function(nick){
+        $.getJSON("/abandonarPartida/" + nick, function (data) {
+            console.log(data);
+        });
     }
+    
+    this.cerrarSesion=function(){
+		$.getJSON("/cerrarSesion",function(data){
+			console.log(data);			
+			//iu.mostrarAgregarJugador();
+			//iu.mostrarListaResultados(data);
+		})
+	}
 }

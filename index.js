@@ -7,29 +7,45 @@ var { Server } = require("socket.io");
 var io = new Server(http);
 
 var bodyParser = require("body-parser");
-//var passport = require("passport");
-//var cookieSession = require("cookie-session");
+var passport = require("passport");
+var localStrategy = require("passport-local").Strategy;
+var cookieSession = require("cookie-session");
+require("./servidor/passport-setup");
 
 var modelo = require("./servidor/modelo.js");
 var ssrv = require("./servidor/servidorWS.js");
 
-var juego = new modelo.Juego();
+//var juego = new modelo.Juego();
+var juego = new modelo.Juego(false);
 var servidorWS = new ssrv.ServidorWS();
 
 app.set('port', process.env.PORT || 5000);
 
 app.use(express.static(__dirname + "/"));
-/*
+
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieSession({
-    name:'unocartas', //nombre de la cookie
-    keys:["key1","key2"]
+    name: 'unocartas', //nombre de la cookie
+    keys: ["key1", "key2"]
 }));
+
+passport.use(new localStrategy({ usernameField: "email", passwordField: "clave" },
+    function (email, clave, done) {
+        juego.loginUsuario(email, clave, function (err, user) {
+            if (err) {
+                return done(err);
+            }
+            else {
+                return done(null, user);
+            }
+        })
+    }
+))
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
 
 const haIniciado = function (request, response, next) {
     if (request.user) {
@@ -39,7 +55,6 @@ const haIniciado = function (request, response, next) {
         response.redirect("/");
     }
 }
-*/
 
 app.get("/", function (request, response) {
     var contenido = fs.readFileSync(__dirname + "/cliente/index.html");
@@ -47,10 +62,78 @@ app.get("/", function (request, response) {
     response.send(contenido);
 });
 
+// /auth/google --> redirecciona al usuario a Google para validarlo
+app.get("/auth/google", passport.authenticate('google', {scope:['profile', 'email']}))
+
+// /good --> usuario de Google válido
+app.get("/good", function(request, response){
+    // nick --> email usuario google
+    // AgregarJugador(nick)
+    var nick = request.user.emails[0].value;
+    juego.agregarJugador(nick);
+    response.cookie('nick', nick);
+    response.redirect("/"); // Mandar usuario al Home
+
+})
+
+// /fail --> usuario de Google inválido.
+app.get("/fail", function(request, response){
+    response.send({ nick: "nook" });
+})
+
+// /google/callback --> Aquí llega la respuesta de Google
+app.get("/google/callback", passport.authenticate('google', {failureRedirect:'/fail'}), function(request, response){
+    response.redirect("/good")
+})
+
+
+app.post('/registrarUsuario', function(request, response){
+    var mail = request.body.email;
+    var clave = request.body.clave;
+    juego.registrarUsuario(mail, clave, function(data){
+        response.send(data)
+    });
+})
+/*
 app.get("/agregarJugador/:nick", function (request, response) {
     var nick = request.params.nick;
     var res = juego.agregarJugador(nick);
     response.send(res);
+});
+*/
+
+app.post("/loginUsuario", passport.authenticate("local",
+    {failureRedirect:"/fail", successRedirect:"/ok"}
+))
+
+app.delete("/eliminarUsuario/:nick", haIniciado, function(request, response){
+    var nick = request.params.nick;
+    var clave = request.body.clave;
+    juego.eliminarUsuario(nick, clave, function(result){
+        response.send(result);
+    });
+})
+
+app.put("/editarUsuario/:nickActual/:nick", haIniciado, function(request, response){
+    var nick = request.params.nick;
+    var nickActual = request.params.nickActual;
+    
+    juego.editarUsuario(nickActual, nick, function(result){
+        response.send(result);
+    });
+})
+
+app.get("/ok", haIniciado, function(request, response){
+    response.send({nick:request.user.nick});
+})
+
+app.get("/confirmarUsuario/:direccion/:key", function (request, response) {
+    var email = request.params.direccion;
+    var key = request.params.key;
+
+    juego.confirmarUsuario(email,key,function(data){
+        response.redirect("/");
+    });
 });
 
 app.get("/crearPartida/:nick/:numJug", function (request, response) {
@@ -98,6 +181,7 @@ app.get("/obtenerPartidasDisponibles", function (request, response) {
     }
 })
 
+//new
 app.get("/obtenerTodosResultados", function (request, response) {
     if (juego) {
         juego.obtenerTodosResultados(function (lista) {
@@ -115,6 +199,7 @@ app.get("obtenerResultados/:nick", function (request, response) {
     }
 })
 
+//new
 app.get("/cerrarSesion/:nick", function (request, response) {
     var nick = request.params.nick;
     var jugador = juego.usuarios[nick];
@@ -123,25 +208,6 @@ app.get("/cerrarSesion/:nick", function (request, response) {
         response.send({ res: "ok" });
     }
 })
-
-app.post('/registrarUsuario', function (request, response) {
-    var email = request.body.email;
-    var clave = request.body.clave;
-
-    juego.registrarUsuario(email, clave, function (data) {
-        response.send(data);
-    });
-})
-
-app.post('/loginUsuario', function (request, response) {
-    var email = request.body.email;
-    var clave = request.body.clave;
-
-    juego.loginUsuario(email, clave, function (data) {
-        response.send(data);
-    });
-})
-
 
 http.listen(app.get('port'), function () {
     console.log("La app NodeJS se esta ejecutando en el puerto ", app.get("port"));

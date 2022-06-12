@@ -1,19 +1,69 @@
 function ControlWeb() {
     //para la vista
-
     //Cookies
     this.comprobarUsuario = function () {
-        if ($.cookie("nick")) {
-            ws.nick = $.cookie("nick");
-            //iu.mostrarHome({nick:ws.nick});
-            iu.mostrarLobby();
-        } else {
+        if ($.cookie("nick")){
+            ws.nick=$.cookie("nick");
+            iu.mostrarHome({nick:ws.nick});
+        }else{
             iu.mostrarAgregarJugador();
         }
-
     }
 
+    this.mostrarHome= function(data){
+        rest.obtenerPartidasDisponibles();
+        iu.mostrarSalirPartida();
+        iu.mostrarControl(ws.nick);
+        iu.mostrarCrearPartida();
+    }
+
+    this.mostrarRegistro=function(){
+		$('#signup').load("/cliente/signup.html",function(){
+			$("#btnSU").on("click",function(e){
+				if ($('#email').val() === '' || $('#password').val()==='') {
+				    e.preventDefault();
+				    //alert('introduce un nick');
+				}
+				else{
+					var email=$('#email').val();
+					var pass=$('#password').val();
+					//$("#mAJ").remove();
+					//$("#aviso").remove();
+					rest.registrarUsuario(email,pass);
+				}
+			})
+			$("#si").on("click",function(){
+				iu.mostrarLogin();
+			})
+		});
+	}
+
+	this.mostrarLogin=function(aviso){
+		$('#signup').load("/cliente/signin.html",function(){
+			if (aviso){
+				$("#info span").text("Usuario o clave incorrectos");
+			}
+			$("#btnSI").on("click",function(e){
+				if ($('#email').val() === '' || $('#password').val()==='') {
+				    e.preventDefault();
+				    //alert('introduce un nick');
+				}
+				else{
+					var email=$('#email').val();
+					var pass=$('#password').val();
+					//$("#mAJ").remove();
+					//$("#aviso").remove();
+					rest.loginUsuario(email,pass);
+				}
+			});
+			$("#reg").on("click",function(){
+				iu.mostrarRegistro();
+			})
+		});
+	}
+
     //AGREGAR JUGADOR
+    
     this.mostrarTexto = function () {
         var cadena = '<div id = "mT">'
         cadena += '<p> Introduce tu nick para comenzar a jugar </p>'
@@ -46,6 +96,46 @@ function ControlWeb() {
             }
         })
     }
+    
+    /*
+    this.mostrarAgregarJugador=function(){
+		var cadena='<form class="form-row needs-validation"  id="mAJ">';
+		cadena=cadena+'<div class="col">'
+        //cadena=cadena+'<input type="text" class="form-control mb-2 mr-sm-2" id="usr" placeholder="Introduce tu nick (max 6 letras)" required></div>';
+        cadena=cadena+'<div class="col">';
+        //cadena=cadena+'<button id="btnAJ" class="btn btn-primary mb-2 mr-sm-2">Entrar</button>';
+        cadena=cadena+'<a href="/auth/google" class="btn btn-primary mb-2 mr-sm-2">Accede con Google</a>';
+        cadena=cadena+'</div></form>';
+
+		$("#agregarJugador").append(cadena);     
+		$("#nota").append("<div id='aviso' style='text-align:right'>Inicia sesión con Google para jugar</div>");    
+
+		$("#btnAJ").on("click",function(e){
+			if ($('#usr').val() === '' || $('#usr').val().length>6) {
+			    e.preventDefault();
+			    //alert('introduce un nick');
+			}
+			else{
+				var nick=$('#usr').val();
+				$("#mAJ").remove();
+				$("#aviso").remove();
+				rest.agregarJugador(nick);
+			}
+		})
+	}
+    */
+
+    //new
+    this.mostrarEsperando=function(){
+		$('#spin').remove();
+		var cadena='<div class="d-flex justify-content-center" id="spin">';
+		cadena=cadena+'<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>';
+		cadena=cadena+"</div>";
+		$('#esperando').append(cadena);
+	}
+	this.quitarEsperando=function(){
+		$('#spin').remove();
+	}
 
     this.mostrarSalirPartida = function () {
         var cadena = '<div id = "mSP">'
@@ -60,7 +150,7 @@ function ControlWeb() {
             $("#mM").remove();
             $("#mCA").remove();
             $("#mCP").remove();
-            $("#mEs").remove();
+            $("#mEsp").remove();
             $("#mLP").remove();
             $('#mTur').remove();
             $('#mCod').remove();
@@ -91,6 +181,14 @@ function ControlWeb() {
             iu.mostrarAgregarJugador();
         })
     }
+
+    /*
+    this.mostrarAbandonar=function(){
+		$('#abandonar').remove();
+		var cadena='<li id="abandonar"><a href="#" onclick="abandonar();">Abandonar</a></li>';
+		$('#navbar').append(cadena);
+	}
+    */
 
     //mostrarTurno
     this.mostrarTurno = function (nick) {
@@ -129,7 +227,7 @@ function ControlWeb() {
     }
 
     this.mostrarEsperando = function () {
-        var cadena = '<div id=mEs>'
+        var cadena = '<div id=mEsp>'
         cadena += '<button class="btn btn-primary" disabled>'
         cadena += '<span class="spinner-grow spinner-grow-sm"></span>  Esperando jugadores  </button>'
         cadena += '</div>'
@@ -195,7 +293,6 @@ function ControlWeb() {
         $('#mM').remove();
         //console.log(lista); 
 
-
         var cadena = '<div class="list-group" id="mM">';
         cadena += '<div class="card-columns">'
 
@@ -209,15 +306,15 @@ function ControlWeb() {
         }
 
         /*
-                var cadena = '<div id="mM" class="card-columns row">'
-                
-                for (var i = 0; i<lista.length; i++) {
-                    var carta = lista[i].img+".png"
-                    cadena += `
-                    <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
-                        <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/cartas`+carta+`" alt=""></a>
-                    </div>`
-                }
+        var cadena = '<div id="mM" class="card-columns row">'
+        
+        for (var i = 0; i<lista.length; i++) {
+            var carta = lista[i].img+".png"
+            cadena += `
+            <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
+                <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/cartas`+carta+`" alt=""></a>
+            </div>`
+        }
         */
 
         cadena += '</div>';
@@ -249,7 +346,7 @@ function ControlWeb() {
 
     this.mostrarCartaActual = function (carta) {
         $('#mCA').remove();
-        $('#mEs').remove();
+        $('#mEsp').remove();
         $('#mLP').remove();
         var cadena = '<div id="mCA" class="card-columns">';
 
@@ -263,7 +360,7 @@ function ControlWeb() {
         $('#actual').append(cadena);
     }
     /*
-    his.mostrarRivales=function(data){
+    this.mostrarRivales=function(data){
         $('#mLR').remove();
         var cadena="<div id='mLR'><h3>Rivales:</h3>";
         for(i=0;i<data.length;i++){
@@ -278,24 +375,41 @@ function ControlWeb() {
         }
         $('#rivales').append(cadena);
     */
-    /*
-    this.limpiar = function () {
-        $("#mT").remove();
-        $("#mAJ").remove();
-        $("#btnAJ").remove();
-        $("#mSP").remove();
-        $("#btnSP").remove();
-        $("#mAbJ").remove();
-        $("#mTur").remove();
-        $("#mCP").remove();
-        $("#mEs").remove();
-        $("#mCod").remove();
-        $("#mCon").remove();
+   /*
+    this.limpiar=function(){
+        $('#mAJ').remove();
+        $('#mC').remove();
+        $('#mCP').remove();
         $('#mLP').remove();
-        $('#cM').remove();
-        $('#mM').remove();
+        $('#spin').remove();
+        $('#cartas').remove();
+        $('#carta2').remove();
+        $('#cartas2').remove();
+        $('#carta').remove();
+        $('#mLR').remove();
+        $('#miTurno').remove();
         $('#mR').remove();
-        $('#mCA').remove();
+        $('#mUcC').remove();
+        $('#mMQ1').remove();
+        $('#abandonar').remove();
+        $('#salir').remove();
+    }
+    this.limpiarAbandonar=function(){
+        $('#mAJ').remove();
+        $('#mC').remove();
+        $('#mCP').remove();
+        $('#mLP').remove();
+        $('#spin').remove();
+        $('#cartas').remove();
+        $('#carta2').remove();
+        $('#cartas2').remove();
+        $('#carta').remove();
+        $('#mLR').remove();
+        $('#miTurno').remove();
+        $('#mR').remove();
+        $('#mUcC').remove();
+        $('#abandonar').remove();
+        $('#mMQ1').remove();
     }
     */
 }

@@ -39,7 +39,7 @@ function ServidorWS() {
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe");
                 }
-            })
+            });
 
             socket.on("unirAPartida", function (codigo, nick) {
                 var jugador = juego.usuarios[nick];
@@ -80,6 +80,15 @@ function ServidorWS() {
                 }
             });
 
+            socket.on("manoTurno", function (nick) {
+				var jugador = juego.usuarios[nick];
+				if (jugador) {
+					cli.enviarAlRemitente(socket, "mano", jugador.mano);
+				} else {
+					cli.enviarAlRemitente(socket, "fallo", "El usuario no existe");
+				}
+			});
+
             socket.on("jugarCarta", function (nick, num) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
@@ -88,10 +97,15 @@ function ServidorWS() {
                     var codigo = jugador.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
-                    cli.enviarATodos(io, codigo, "turno", { turno: nickTurno, cartaActual: partida.cartaActual })
-                    if (partida.fase.nombre == "final") {
-                        cli.enviarATodos(io, codigo, "final", { ganador: nickTurno });
+                    if (jugador.mano.length == 1) {
+                        cli.enviarATodos(io, codigo, "ultimaCarta", { nick: jugador.nick });
                     }
+                    if (partida.fase.nombre == "final") {
+                        console.log(partida.fase.nombre);
+					    console.log(nickTurno);
+                        cli.enviarATodos(io, codigo, "final", { nick: nickTurno });
+                    }
+                    cli.enviarATodos(io, codigo, "turno", { turno: nickTurno, cartaActual: partida.cartaActual })
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
@@ -112,12 +126,21 @@ function ServidorWS() {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
             })
+            /*
+            socket.on("meQuedaUna",function (nick) {
+                var jugador = juego.usuarios[nick];
+                if (ju1) {
+                    var codigo = jugador.codigoPartida;
+                    //...
+                }
+            })
+            */
 
-            socket.on("pasarTurno", function (nick, num) {
+            socket.on("pasarTurno", function (nick) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.pasarTurno();
-                    cli.enviarAlRemitente(socket, "mano", jugador.mano);
+                    //cli.enviarAlRemitente(socket, "mano", jugador.mano);
                     var codigo = jugador.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
@@ -127,6 +150,7 @@ function ServidorWS() {
                 }
             })
 
+            //new
             socket.on("abandonarPartida", function (nick) {
                 var ju1 = juego.usuarios[nick];
                 if (ju1) {

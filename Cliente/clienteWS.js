@@ -35,13 +35,36 @@ function ClienteWS() {
         this.socket.emit("pasarTurno", this.nick);
     }
 
+    //new
+    this.obtenerMano=function(){
+		this.socket.emit("obtenerMano",this.nick);
+	}
+
+    /*
+    this.meQuedaUna=function(){
+		this.socket.emit("meQuedaUna",this.nick);
+	}
+    */
+
     this.abandonarPartida = function () {
         this.socket.emit("abandonarPartida", this.nick);
     }
 
     this.cerrarSesion = function () {
+        rest.cerrarSesion();
         this.socket.emit("cerrarSesion", this.nick);
     }
+
+    //new
+    this.usuarioEliminado = function(){
+		this.socket.emit("usuarioEliminado", this.nick);
+	}
+
+    /*
+    this.finalPartida=function(){
+		this.socket.emit("finalPartida",this.nick);	
+	}
+    */
 
     //Espera de respuestas, a la escucha (Zona servidor del clienteWS)
     this.servidorWSCliente = function () {
@@ -52,8 +75,11 @@ function ClienteWS() {
 
         this.socket.on("partidaCreada", function (data) {
             console.log(data);
-            ws.codigo = data.codigo;
-            iu.mostrarCodigo(ws.codigo);
+            //ws.codigo = data.codigo;
+            cli.codigo=data.codigo;
+            //iu.mostrarCodigo(ws.codigo);
+            iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
+			iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
@@ -67,60 +93,114 @@ function ClienteWS() {
         this.socket.on("unidoAPartida", function (data) {
             console.log(data);
             cli.codigo = data.codigo;
+            //iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
+			iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
+        /*
+        this.socket.on("nuevoJugador",function(lista){
+			iu.mostrarRivales(lista);
+		})
+        */
+
         this.socket.on("pedirCartas", function (data) {
             cli.manoInicial();
+            //iu.limpiar();
+			//iu.mostrarJugando({ nick: cli.nick, codigo: cli.codigo});
             iu.mostrarRobar();
         })
 
         this.socket.on("mano", function (data) {
             console.log(data);
+            /*
+            iu.quitarEsperando();
+			iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"2");
+			iu.mostrarRobar();
+			iu.mostrarMeQueda1();
+            */
             iu.mostrarMano(data);
         })
 
+        /*
+        this.socket.on("manoUpdate",function(data){
+			console.log(data);
+			iu.mostrarMano(data);
+		});
+        */
+
+        this.socket.on("ultimaCarta", function (data) {
+			console.log(data);
+			iu.mostrarAlertaUno(data.nick);
+		});
+
         this.socket.on("turno", function (data) {
             console.log(data);
+            cli.obtenerMano();
+            /*
+			iu.mostrarRivales(data.rivales);
+			iu.mostrarCarta(data.cartaActual,"actual");
+            //iu.mostrarCartaActual(data.cartaActual);
+			cli.meToca=data.turno==cli.nick;
+			iu.mostrarTurno(cli.meToca);
+            */
             iu.mostrarCartaActual(data.cartaActual);
             iu.mostrarTurno(data.turno);
         })
-        /*
-        this.socket.on("final", function (data) {
-            ws.codigo = "";
-            iu.mostrarModal("¡¡" + data.ganador + " ha ganado la partida!!");
-        })
-        */
+
         this.socket.on("final", function (data) {
             if (data.ganador == cli.nick) {
-                iu.mostrarModal("Game Over. Enhorabuena, has ganado!!");
+                iu.mostrarModal("Enhorabuena, has ganado!!");
                 iu.abandonar();
             }
             else {
                 iu.mostrarModal("Game Over. Ha ganado: " + data.ganador);
+                //cli.finalPartida();
                 iu.abandonar();
             }
         });
 
         this.socket.on("fallo", function (data) {
             console.log(data);
+			iu.mostrarModal(data);
+			iu.mostrarHome();
+            /*
+            iu.limpiar();
+			iu.comprobarUsuario();
+            */
         })
+
+        this.socket.on("abandonarPartida", function (data) {
+			ui.mostrarModal("Un jugador ha abandonado la partida");
+            //iu.abandonar();
+            ui.limpiar();
+            ui.mostrarHome({ nick: cli.nick });
+            cli.codigo = "";
+		});
 
         this.socket.on("jugadorAbandona", function (data) {
             ui.mostrarModal("Un jugador ha abandonado la partida");
+            //iu.abandonar();
             ui.limpiar();
             ui.mostrarHome({ nick: cli.nick });
             cli.codigo = "";
         });
-        
-        this.socket.on("usuaruioEliminado", function (data) {
+
+        //new
+        this.socket.on("usuarioEliminado", function (data) {
             cli.nick = "";
             cli.codigo = "";
+            //ws.usuarioEliminado();
             $.removeCookie("nick");
             ui.limpiar();
             ui.mostrarAgregarJugador();
         });
 
+        /*
+        this.socket.on("leQuedaUna",function(data){
+			iu.mostrarModal("Jugador: "+data.nick+" ¡Me queda una carta!");
+		})
+        */
     }
     this.conectar();
 }
