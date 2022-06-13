@@ -3,8 +3,10 @@ var cad = require("./cad.js");
 var moduloEmail = require("./email.js");
 
 function Juego(test) {
+//function Juego() {
     this.usuarios = {};
     this.partidas = {};
+    //this.cad = new cad.CAD();
     this.cad; //new cad.CAD();
 
     this.agregarJugador = function (nick) {
@@ -19,11 +21,11 @@ function Juego(test) {
         }
         return res;
     }
-
+    /*
     this.eliminarUsuario = function(nick, clave, callback){
         var ju = this;
         this.cad.encontrarUsuarioCriterio({nick:nick}, function(usr){
-            if (usr && clave==cf.decryptStr(usr.clave, 'sEcrEt')){
+            if (usr && clave==cf.decryptStr(usr.clave, 'sEcrEtA')){
                 ju.cad.eliminarUsuario(usr._id, function(result){
                     console.log("Usuario eliminado");
                     callback({res:1});
@@ -50,7 +52,7 @@ function Juego(test) {
             }
         })
     }
-
+    */
     this.crearPartida = function (nick, numJug) {
         var jugador = this.usuarios[nick];
         if (numJug >= 2 && numJug <= 8) {
@@ -131,7 +133,7 @@ function Juego(test) {
 
     this.registrarUsuario = function (email, clave, cb) {
         var ju = this;
-        var claveCifrada = cf.encryptStr(clave, 'sEcrEt');
+        var claveCifrada = cf.encryptStr(clave, 'sEcrEtA');
         var nick = email;
         var key = (new Date().valueOf()).toString();
 
@@ -140,7 +142,7 @@ function Juego(test) {
                 ju.cad.insertarUsuario({ email: email, clave: claveCifrada, key: key, nick: nick, confirmada: false }, function (usu) {
                     cb({ email: 'ok' });
                 });
-                moduloEmail.enviarEmailConfirmacion(email, key);
+                //moduloEmail.enviarEmailConfirmacion(email, key);
             }
             else {
                 cb({ email: "nook" })
@@ -171,7 +173,7 @@ function Juego(test) {
         var nick = email;
         this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
             if (usr) {
-                var clavedesCifrada = cf.decryptStr(usr.clave, 'sEcrEt');
+                var clavedesCifrada = cf.decryptStr(usr.clave, 'sEcrEtA');
                 if (clave == clavedesCifrada && usr.confirmada) {
                     cb(null, usr);
                     ju.agregarJugador(usr.nick);
@@ -186,12 +188,14 @@ function Juego(test) {
             }
         })
     }
-
+    
     //Se ejecuta al crear el objeto juego
     if (!test) {
         this.cad = new cad.CAD();
         this.cad.conectar();
     }
+    
+    //this.cad.conectar(function () {})
 
 }
 //Fin juego
@@ -265,11 +269,11 @@ function Jugador(nick, juego) {
             partida.finPartida();
         }
     }
-
+    /*
     this.eliminarUsuario=function(callback){
         this.juego.eliminarUsuario(this._id, callback);
     }
-
+    */
     //new
     this.abandonarPartida = function () {
         var partida = this.obtenerPartida(this.codigoPartida);
@@ -639,7 +643,7 @@ function Mas2(valor, color) {
 //Not implemented
 function Comodin(valor, color) {
     this.tipo = "comodin";
-    //this.nombre = "comodin" + color;
+    //this.nombre = "comodin";
     this.valor = valor;
     this.color = color;
     this.comprobarEfecto = function (partida) {
@@ -650,7 +654,7 @@ function Comodin(valor, color) {
 //Not implemented
 function Comodin4(valor, color) {
     this.tipo = "comodin4";
-    //this.nombre = "comodin4" + color;
+    //this.nombre = "comodin4";
     this.valor = valor;
     this.color = color;
     this.comprobarEfecto = function (partida) {

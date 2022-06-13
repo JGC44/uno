@@ -87,20 +87,28 @@ app.get("/google/callback", passport.authenticate('google', {failureRedirect:'/f
 })
 
 
-app.post('/registrarUsuario', function(request, response){
-    var mail = request.body.email;
-    var clave = request.body.clave;
-    juego.registrarUsuario(mail, clave, function(data){
-        response.send(data)
+app.post('/registrarUsuario',function(request,response){
+    var email=request.body.email;
+    var clave=request.body.clave;
+    juego.registrarUsuario(email,clave,function(data){
+        response.send(data);
     });
 })
-/*
+
+app.post('/loginUsuario',passport.authenticate("local",{failureRedirect:"/fallo",successRedirect: "/ok"})
+);
+
+app.get("/ok",haIniciado,function(req,res){
+    res.send({nick:req.user.nick})
+});
+
+
 app.get("/agregarJugador/:nick", function (request, response) {
     var nick = request.params.nick;
     var res = juego.agregarJugador(nick);
     response.send(res);
 });
-*/
+
 
 app.post("/loginUsuario", passport.authenticate("local",
     {failureRedirect:"/fail", successRedirect:"/ok"}
@@ -121,10 +129,6 @@ app.put("/editarUsuario/:nickActual/:nick", haIniciado, function(request, respon
     juego.editarUsuario(nickActual, nick, function(result){
         response.send(result);
     });
-})
-
-app.get("/ok", haIniciado, function(request, response){
-    response.send({nick:request.user.nick});
 })
 
 app.get("/confirmarUsuario/:direccion/:key", function (request, response) {

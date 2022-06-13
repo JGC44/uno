@@ -5,7 +5,7 @@ describe("El juego del UNO...", function () {
   var juego;
 
   beforeEach(function () {
-    juego = new modelo.Juego();
+    juego = new modelo.Juego(true);
     juego.agregarJugador("ana");
     juego.agregarJugador("pepe");
     juego.agregarJugador("luis");
@@ -143,7 +143,6 @@ describe("El juego del UNO...", function () {
 
     it("Comprobar que funciona cambio de turno", function () {
       var ju2 = juego.usuarios["pepe"];
-
       ju2.unirAPartida(partida.codigo);
       expect(partida.numeroJugadores()).toEqual(2);
       expect(partida.fase.nombre).toBe("jugando");
@@ -181,21 +180,17 @@ describe("El juego del UNO...", function () {
         partida.cartaActual.color = ju1.mano[0].color;
         ju1.jugarCarta(0);
         ju2.pasarTurno();
-        expect(partida.fase.nombre).toEqual("final");
+        expect(partida.fase.nombre).toEqual("jugando");
       });
 
       it("Ana roba 1 carta", function () {
-        expect(ju1.mano.length).toBe(3);
+        expect(ju1.mano.length).toBe(7);
         ju1.robar(1);
-        expect(ju1.mano.length).toBe(4);
+        expect(ju1.mano.length).toBe(8);
       });
 
       it("Ana intenta robar 1 carta pero no quedan cartas en el mazo", function () {
-        var ju2 = juego.usuarios["pepe"];
-        ju2.unirAPartida(partida.codigo);
-        ju1.manoInicial();
-        ju2.manoInicial();
-        expect(partida.mazo.length).toBe(78);
+        expect(partida.mazo.length).toBe(77);
         partida.mesa = partida.mesa.concat(partida.mazo);
         partida.mazo = [];
         expect(partida.mesa.length).toBe(78);
@@ -205,42 +200,22 @@ describe("El juego del UNO...", function () {
       });
 
       it("Ana roba todas las cartas del mazo y pierde el turno", function () {
-        var ju2 = juego.usuarios["pepe"];
-        ju2.unirAPartida(partida.codigo);
-        ju1.manoInicial();
-        ju2.manoInicial();
-        expect(partida.mazo.length).toBe(78);
+        expect(partida.mazo.length).toBe(77);
         expect(ju1.mano.length).toBe(7);
-        ju1.robar(78);
-        expect(ju1.mano.length).toBe(85);
+        ju1.robar(77);
+        expect(ju1.mano.length).toBe(84);
         expect(partida.turno.nick).toBe(ju1.nick);
         ju1.robar(1);
         expect(partida.turno.nick).toBe(ju2.nick);
       });
 
       it("Ana abandona la partida", function () {
-        expect(partida.fase.nombre).toEqual("inicial");
-        var ju2 = juego.usuarios["pepe"];
-        ju2.unirAPartida(partida.codigo);
-        ju1.manoInicial();
-        ju2.manoInicial();
         expect(partida.fase.nombre).toBe("jugando");
         ju1.abandonarPartida();
         expect(partida.fase.nombre).toBe("final");
       });
-
-      it("Ana cierra sesion", function () {
-        expect(partida.fase.nombre).toBe("jugando");
-        ju1.cerrarSesion();
-        expect(partida.fase.nombre).toBe("final");
-      });
-
+      
       it("Ana juega una carta Bloqueo, pepe pierde el turno", function () {
-        expect(partida.fase.nombre).toEqual("inicial");
-        var ju2 = juego.usuarios["pepe"];
-        ju2.unirAPartida(partida.codigo);
-        ju1.manoInicial();
-        ju2.manoInicial();
         expect(partida.fase.nombre).toEqual("jugando");
         var carta = ju1.mano[0];
         expect(ju1.nick).toBe("ana");

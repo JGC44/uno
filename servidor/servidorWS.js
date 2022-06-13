@@ -103,7 +103,7 @@ function ServidorWS() {
                     if (partida.fase.nombre == "final") {
                         console.log(partida.fase.nombre);
 					    console.log(nickTurno);
-                        cli.enviarATodos(io, codigo, "final", { nick: nickTurno });
+                        cli.enviarATodos(io, codigo, "final", { ganador: nickTurno });
                     }
                     cli.enviarATodos(io, codigo, "turno", { turno: nickTurno, cartaActual: partida.cartaActual })
                 } else {

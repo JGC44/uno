@@ -46,18 +46,17 @@
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <a class="navbar-brand" href="#">
-      <img src="/img/otros/logo.png" alt="logo" style="width:40px;">
+      <img src="/cliente/img/otros/logo.png" alt="logo" style="width:40px;">
     </a>
     <!-- Links -->
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="https://jgc44.github.io/uno/"> Home </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Info</a>
+        <a class="nav-link" href="https://jgc44.github.io/uno/"> Como Jugar </a>
       </li>
     </ul>
-
   </nav>
 
   <div class="container cab">
@@ -149,11 +148,8 @@
     rest = new ClienteRest();
     ws = new ClienteWS();
     iu = new ControlWeb();
-    iu.mostrarAgregarJugador();
-    //iu.comprobarUsuario();
-    if($.cookie("nick")) {
-        iu.comprobarUsuario()
-    }
+    //iu.mostrarAgregarJugador();
+    iu.comprobarUsuario();
   </script>
 </body>
 

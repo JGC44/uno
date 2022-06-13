@@ -26,15 +26,17 @@ function CAD() {
         encontrarCriterio(this.resultadosCol, criterio, callback);
     }
 
-    function encontrarCriterio(collection, criterio, callback) {
-        collection.find(criterio).toArray(function (err, col) {
-            if (err) {
-                callback([]);
-            } else {
-                callback(col);
+    function encontrarCriterio(coleccion, criterio,callback){
+        coleccion.find(criterio).toArray(function(err,usr){
+            if (usr.length==0){
+                callback(undefined);
+            }
+            else{
+                callback(usr[0]);
             }
         })
     }
+
 
     function encontrarTodos(collection, callback) {
         collection.find().toArray(function (err, datos) {
@@ -71,7 +73,6 @@ function CAD() {
         coleccion.findOneAndUpdate({ _id: usr._id }, {$set:usr}, {upsert:false}, function (err, result) {
             if (err) {
                 console.log("No se pudo actualizar la colección (método genérico)");
-                //iu.mostrarPerfil();
             }
             else {
                 console.log("Elemento actualizado");
@@ -90,7 +91,7 @@ function CAD() {
             else {
                 console.log("Conectando a Atlas MongoDB")
                 cad.resultadosCol = db.db("unoDB1").collection("resultados");  //CAD con mayuscula?
-                cad.usuariosCol = db.db("unoDB1").collection("usuarios");
+                //cad.usuariosCol = db.db("unoDB1").collection("usuarios");
             }
         })
     }

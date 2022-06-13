@@ -47,8 +47,8 @@ function ClienteRest() {
 
     this.agregarJugador = function (nick) {
         var cli = this;
-        //$.getJSON("/agregarJugador/" + nick, function (data) {
-        $.getJSON("/auth/google", function (data) {
+        $.getJSON("/agregarJugador/" + nick, function (data) {
+        //$.getJSON("/auth/google", function (data) {
             //se ejecuta cuando contesta el servidor
             console.log(data);
 
@@ -70,7 +70,7 @@ function ClienteRest() {
         //sigue la ejecución sin esperar
         //mostrar un reloj, temporizado, cargando, etc
     }
-
+    /*
     //new
     this.eliminarUsuario=function(clave){
 		var nick=$.cookie("nick");
@@ -94,6 +94,21 @@ function ClienteRest() {
 			dataType:"json"
 		});
 	}
+    */
+
+    this.comprobarUsuario=function(nick){
+        $.getJSON("/comprobarUsuario/"+nick,function(data){
+            console.log(data);
+            if (data=="nook"){
+                $.removeCookie("nick")
+            }
+            else{
+                ws.nick=$.cookie("nick");            
+                iu.mostrarHome({nick:ws.nick});
+                rest.obtenerPartidasDisponibles();
+            }
+        })
+    }
 
     this.crearPartida = function (nick, numJ) {
         $.getJSON("/crearPartida/" + nick + "/" + numJ, function (data) {
@@ -114,8 +129,8 @@ function ClienteRest() {
     this.obtenerTodasPartidas = function () {
         $.getJSON("/obtenerTodasPartidas", function (data) {
             console.log(data);
-            iu.mostrarObtenerTodasPartidas(data);
-            //iu.mostrarListaPartidas(data);
+            //iu.mostrarObtenerTodasPartidas(data);
+            iu.mostrarListaPartidas(data);
         })
     }
 
@@ -145,7 +160,7 @@ function ClienteRest() {
         });
     }
 
-    /*
+    
     this.mostrarJuego = function () {
         $.getJSON("/mostrarJuego", function (data) {
             console.log(data);
@@ -158,14 +173,14 @@ function ClienteRest() {
         cadena = cadena + '<p>Nick: ' + data.nick + '<p>';
         cadena = cadena + '</div>';
     }
-    */
+    
 
     //new (BBDD)
     this.obtenerTodosResultados = function () {
         $.getJSON("/obtenerTodosResultados", function (data) {
             console.log(data);
-            iu.todosResultados(data);
-            iu.mostrarVolver();
+            //iu.todosResultados(data);
+            //iu.mostrarVolver();
             //iu.mostrarListaResultados(data);
         })
     }

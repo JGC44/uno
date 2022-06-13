@@ -4,17 +4,28 @@ function ControlWeb() {
     this.comprobarUsuario = function () {
         if ($.cookie("nick")){
             ws.nick=$.cookie("nick");
-            iu.mostrarHome({nick:ws.nick});
+            //iu.mostrarHome({nick:ws.nick});
         }else{
+            //iu.mostrarLogin();
             iu.mostrarAgregarJugador();
         }
     }
+    /*
+    this.comprobarUsuario=function(){
+        if ($.cookie("nick")){
+            rest.comprobarUsuario($.cookie("nick"));
+        }
+        else{
+            iu.mostrarLogin();
+        }
+    }
+    */
 
     this.mostrarHome= function(data){
+        iu.mostrarAbandonarJuego();
+        iu.mostrarControl(data.nick)
+        iu.mostrarCrearPartida(data.nick);
         rest.obtenerPartidasDisponibles();
-        iu.mostrarSalirPartida();
-        iu.mostrarControl(ws.nick);
-        iu.mostrarCrearPartida();
     }
 
     this.mostrarRegistro=function(){
@@ -125,7 +136,7 @@ function ControlWeb() {
 	}
     */
 
-    //new
+    /*
     this.mostrarEsperando=function(){
 		$('#spin').remove();
 		var cadena='<div class="d-flex justify-content-center" id="spin">';
@@ -136,7 +147,7 @@ function ControlWeb() {
 	this.quitarEsperando=function(){
 		$('#spin').remove();
 	}
-
+    */
     this.mostrarSalirPartida = function () {
         var cadena = '<div id = "mSP">'
         cadena += '<button type="button" id="btnSP" class="btn btn-danger">Salir</button>'
@@ -157,6 +168,7 @@ function ControlWeb() {
             $('#mR').remove();
             $("#btnSP").remove();
             $('#mCon').remove();
+            $('#btnAbJ').remove();
 
             iu.mostrarAbandonarJuego();
             iu.mostrarControl(ws.nick);
@@ -178,17 +190,18 @@ function ControlWeb() {
             $("#mLP").remove();
             $('#mCon').remove();
             $('#btnAbJ').remove();
+            $("#mM").remove();
+            $("#mCA").remove();
+            $("#mEsp").remove();
+            $('#mTur').remove();
+            $('#mCod').remove();
+            $('#mR').remove();
+            $("#btnSP").remove();
+
+            //limpiarTodo
             iu.mostrarAgregarJugador();
         })
     }
-
-    /*
-    this.mostrarAbandonar=function(){
-		$('#abandonar').remove();
-		var cadena='<li id="abandonar"><a href="#" onclick="abandonar();">Abandonar</a></li>';
-		$('#navbar').append(cadena);
-	}
-    */
 
     //mostrarTurno
     this.mostrarTurno = function (nick) {
@@ -289,45 +302,44 @@ function ControlWeb() {
         $("#miModal").modal('show');
     }
 
+    this.mostrarAlertaUno = function (msg) {
+        $("#mAlertaUno").remove();
+        $("#mAlertaCodigo").remove();
+     
+        var cadena = '<div id="mAlertaUno" class="alert alert-primary alert-dismissible">';
+        cadena = cadena + '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+        cadena = cadena + '<strong>Al jugador ' + msg + ' le queda solo una carta! </strong></div>';
+        $("#alerta").append(cadena);
+    }
+
     this.mostrarMano = function (lista) {
         $('#mM').remove();
         //console.log(lista); 
-
-        var cadena = '<div class="list-group" id="mM">';
+        var cadena = '<div id="mM" class="card-columns">';
+        //var cadena = '<div class="list-group" id="mM">';
         cadena += '<div class="card-columns">'
-
-        for (i = 0; i < lista.length; i++) {
-            var carta = lista[i].img + ".png"
-            cadena += '<div class ="card bg-light">'
-            cadena += '<div class="card-body text-center">'
-            cadena += '<a href="#" value="' + i + '" class="list-group-item list-group-item-action">';
-            cadena += '<p class="card-text">' + lista[i].tipo + ' ' + lista[i].color + ' ' + lista[i].valor + '</p>';
-            cadena += '</div></div>';
-        }
-
-        /*
-        var cadena = '<div id="mM" class="card-columns row">'
         
-        for (var i = 0; i<lista.length; i++) {
-            var carta = lista[i].img+".png"
-            cadena += `
-            <div id="`+i+`" class="cardcol pb-1 mb-2 misCartas">
-                <a onclick="ws.jugarCarta(`+i+`)"><img class="card-img border border-dark" src="/cliente/img/cartas`+carta+`" alt=""></a>
-            </div>`
+        for (i = 0; i < lista.length; i++) {
+            //var carta = lista[i].nombre.img + ".png"
+            cadena += '<div class ="card bg-light">'
+            //cadena += '<div class="card-body text-center">'
+            cadena += '<a href="#" value="' + i + '" class="list-group-item list-group-item-action">';
+            cadena += '<img class="card-img-top" src="/cliente/img/cartas/'+lista[i].nombre +'.png" alt="Card image" style="width:50px;">'
+            //cadena += '<p class="card-text">' + lista[i].tipo + ' ' + lista[i].color + ' ' + lista[i].valor + '</p>';
+            cadena += '</div>';
         }
-        */
 
         cadena += '</div>';
         $('#mano').append(cadena);
 
         //on click
-        $(".list-group a").click(function () {
+        $(".card-columns a").click(function () {
             var number = -1;
             number = $(this).attr("value");
             if (number != -1) {
                 ws.jugarCarta(number);
-
             }
+            // mostrar me queda 1
         })
     }
 
@@ -342,7 +354,6 @@ function ControlWeb() {
 
     };
 
-    //abandonar partida
 
     this.mostrarCartaActual = function (carta) {
         $('#mCA').remove();
@@ -350,11 +361,11 @@ function ControlWeb() {
         $('#mLP').remove();
         var cadena = '<div id="mCA" class="card-columns">';
 
-        cadena += '<div class ="card bg-light">'
-        cadena += '<div class="card-body text-center">'
-        //cadena += '<img class="card-img-top" src="cliente/img/'+carta.nombre +'.png" alt="Card image">'
-        cadena += '<p class="card-text">' + carta.tipo + ' ' + carta.color + ' ' + carta.valor + '</p>';
-        cadena += '</div></div>';
+        //cadena += '<div class ="card bg-light">'
+        //cadena += '<div class="card-body text-center">'
+        cadena += '<img class="card-img-top" src="/cliente/img/cartas/'+carta.nombre +'.png" alt="Card image" style="width:50px;">'
+        //cadena += '<p class="card-text">' + carta.tipo + ' ' + carta.color + ' ' + carta.valor + '</p>';
+        //cadena += '</div></div>';
 
         cadena += '</div>';
         $('#actual').append(cadena);
@@ -375,7 +386,7 @@ function ControlWeb() {
         }
         $('#rivales').append(cadena);
     */
-   /*
+    /*
     this.limpiar=function(){
         $('#mAJ').remove();
         $('#mC').remove();
@@ -394,6 +405,8 @@ function ControlWeb() {
         $('#abandonar').remove();
         $('#salir').remove();
     }
+    */
+    /*
     this.limpiarAbandonar=function(){
         $('#mAJ').remove();
         $('#mC').remove();

@@ -17,7 +17,8 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
     clientID: "1047772036790-jt8tur4017vaoe3fgcqqkqklbsvs7vlg.apps.googleusercontent.com",
     clientSecret: "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",
-    callbackURL: "https://uno-jgc2.herokuapp.com/google/callback"
+    //callbackURL: "https://uno-jgc2.herokuapp.com/google/callback"
+    callbackURL: "http://localhost:5000/google/callback"
   },
   function(token, tokenSecret, profile, done) {
     //User.findOrCreate({ googleId: profile.id }, function (err, user) {

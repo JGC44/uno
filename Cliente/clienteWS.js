@@ -55,12 +55,12 @@ function ClienteWS() {
         this.socket.emit("cerrarSesion", this.nick);
     }
 
-    //new
+    /*
     this.usuarioEliminado = function(){
 		this.socket.emit("usuarioEliminado", this.nick);
 	}
 
-    /*
+    
     this.finalPartida=function(){
 		this.socket.emit("finalPartida",this.nick);	
 	}
@@ -75,11 +75,11 @@ function ClienteWS() {
 
         this.socket.on("partidaCreada", function (data) {
             console.log(data);
-            //ws.codigo = data.codigo;
-            cli.codigo=data.codigo;
-            //iu.mostrarCodigo(ws.codigo);
-            iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
-			iu.mostrarAbandonar();
+            ws.codigo = data.codigo;
+            //cli.codigo=data.codigo;
+            iu.mostrarCodigo(ws.codigo);
+            //iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
+			//iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
@@ -94,7 +94,7 @@ function ClienteWS() {
             console.log(data);
             cli.codigo = data.codigo;
             //iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
-			iu.mostrarAbandonar();
+			//iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
@@ -136,8 +136,8 @@ function ClienteWS() {
 
         this.socket.on("turno", function (data) {
             console.log(data);
-            cli.obtenerMano();
             /*
+            cli.obtenerMano();
 			iu.mostrarRivales(data.rivales);
 			iu.mostrarCarta(data.cartaActual,"actual");
             //iu.mostrarCartaActual(data.cartaActual);
@@ -169,7 +169,7 @@ function ClienteWS() {
 			iu.comprobarUsuario();
             */
         })
-
+        
         this.socket.on("abandonarPartida", function (data) {
 			ui.mostrarModal("Un jugador ha abandonado la partida");
             //iu.abandonar();
@@ -177,7 +177,7 @@ function ClienteWS() {
             ui.mostrarHome({ nick: cli.nick });
             cli.codigo = "";
 		});
-
+        
         this.socket.on("jugadorAbandona", function (data) {
             ui.mostrarModal("Un jugador ha abandonado la partida");
             //iu.abandonar();
