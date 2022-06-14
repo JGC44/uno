@@ -98,7 +98,7 @@ function ServidorWS() {
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;
                     if (jugador.mano.length == 1) {
-                        cli.enviarATodos(io, codigo, "ultimaCarta", { nick: jugador.nick });
+                        cli.enviarATodos(io, codigo, "meQuedaUna", { nick: jugador.nick });
                     }
                     if (partida.fase.nombre == "final") {
                         console.log(partida.fase.nombre);
@@ -126,21 +126,12 @@ function ServidorWS() {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
             })
-            /*
-            socket.on("meQuedaUna",function (nick) {
-                var jugador = juego.usuarios[nick];
-                if (ju1) {
-                    var codigo = jugador.codigoPartida;
-                    //...
-                }
-            })
-            */
 
             socket.on("pasarTurno", function (nick) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.pasarTurno();
-                    //cli.enviarAlRemitente(socket, "mano", jugador.mano);
+                    cli.enviarAlRemitente(socket, "mano", jugador.mano);
                     var codigo = jugador.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;

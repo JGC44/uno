@@ -31,26 +31,26 @@ describe("El juego del UNO...", function () {
     });
 
     it("Comprobar mazo", function () {
-      expect(partida.mazo.length).toBe(92);
+      expect(partida.mazo.length).toBe(100);
       var rojo = partida.mazo.filter(function (each) {
         return each.color == "rojo";
       });
-      expect(rojo.length).toBe(23);
+      expect(rojo.length).toBe(25);
       var verde = partida.mazo.filter(function (each) {
         return each.color == "verde";
       });
-      expect(verde.length).toBe(23);
+      expect(verde.length).toBe(25);
       var amarillo = partida.mazo.filter(function (each) {
         return each.color == "amarillo";
       });
-      expect(amarillo.length).toBe(23);
+      expect(amarillo.length).toBe(25);
       var azul = partida.mazo.filter(function (each) {
         return each.color == "azul";
       });
-      expect(azul.length).toBe(23);
-      var comodin = partida.mazo.filter(function (each) {
-        return each.tipo == "comodin";
-      });
+      expect(azul.length).toBe(25);
+      //var comodin = partida.mazo.filter(function (each) {
+      //  return each.tipo == "comodin";
+      //});
       //expect(comodin.length).toBe(4);
       //var comodin4=partida.mazo.filter(function(each){
       //  return each.tipo=="comodin4";
@@ -190,20 +190,19 @@ describe("El juego del UNO...", function () {
       });
 
       it("Ana intenta robar 1 carta pero no quedan cartas en el mazo", function () {
-        expect(partida.mazo.length).toBe(77);
-        partida.mesa = partida.mesa.concat(partida.mazo);
-        partida.mazo = [];
-        expect(partida.mesa.length).toBe(78);
+        expect(partida.mazo.length).toBe(85);
         expect(ju1.mano.length).toBe(7);
+        ju1.robar(85);
+        expect(ju1.mano.length).toBe(92);
         ju1.robar(1);
-        expect(ju1.mano.length).toBe(7);
+        expect(ju1.mano.length).toBe(92);
       });
 
       it("Ana roba todas las cartas del mazo y pierde el turno", function () {
-        expect(partida.mazo.length).toBe(77);
+        expect(partida.mazo.length).toBe(85);
         expect(ju1.mano.length).toBe(7);
-        ju1.robar(77);
-        expect(ju1.mano.length).toBe(84);
+        ju1.robar(85);
+        expect(ju1.mano.length).toBe(92);
         expect(partida.turno.nick).toBe(ju1.nick);
         ju1.robar(1);
         expect(partida.turno.nick).toBe(ju2.nick);
@@ -220,8 +219,8 @@ describe("El juego del UNO...", function () {
         var carta = ju1.mano[0];
         expect(ju1.nick).toBe("ana");
         while (!carta || carta.tipo != "bloqueo") {
-          carta = ju1.mano.find(function (el) {
-            return el.tipo == "bloqueo"
+          carta = ju1.mano.find(function (e) {
+            return e.tipo == "bloqueo"
           });
           ju1.robar(1);
         }
@@ -234,6 +233,29 @@ describe("El juego del UNO...", function () {
         expect(partida.cartaActual.tipo).toEqual("bloqueo");
         expect(partida.turno.nick).toEqual(ju1.nick);
         expect(ju2.estado.nombre).toEqual("normal");
+      });
+
+      it("Ana juega una carta Mas2, pepe roba 2 y pierde el turno", function () {
+        expect(partida.fase.nombre).toEqual("jugando");
+        expect(ju2.mano.length).toBe(7);
+        var carta = ju1.mano[0];
+        expect(ju1.nick).toBe("ana");
+        while (!carta || carta.tipo != "mas2") {
+          carta = ju1.mano.find(function (e) {
+            return e.tipo == "mas2"
+          });
+          ju1.robar(1);
+        }
+        expect(carta.tipo).toEqual("mas2");
+        var ind = ju1.mano.indexOf(carta);
+        expect(ju1.mano[ind].tipo).toEqual("mas2");
+        partida.cartaActual.color = carta.color;
+        expect(partida.turno.nick).toEqual(ju1.nick);
+        ju1.jugarCarta(ind);
+        expect(partida.cartaActual.tipo).toEqual("mas2");
+        expect(partida.turno.nick).toEqual(ju1.nick);
+        expect(ju2.estado.nombre).toEqual("normal");
+        expect(ju2.mano.length).toBe(9);
       });
     });
   });

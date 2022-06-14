@@ -40,12 +40,6 @@ function ClienteWS() {
 		this.socket.emit("obtenerMano",this.nick);
 	}
 
-    /*
-    this.meQuedaUna=function(){
-		this.socket.emit("meQuedaUna",this.nick);
-	}
-    */
-
     this.abandonarPartida = function () {
         this.socket.emit("abandonarPartida", this.nick);
     }
@@ -129,11 +123,6 @@ function ClienteWS() {
 		});
         */
 
-        this.socket.on("ultimaCarta", function (data) {
-			console.log(data);
-			iu.mostrarAlertaUno(data.nick);
-		});
-
         this.socket.on("turno", function (data) {
             console.log(data);
             /*
@@ -147,6 +136,15 @@ function ClienteWS() {
             iu.mostrarCartaActual(data.cartaActual);
             iu.mostrarTurno(data.turno);
         })
+
+        this.socket.on("meQuedaUna", function (data) {
+            if (data.nick == cli.nick) {
+                iu.mostrarModal("Te queda Una!!");
+            }
+            else {
+                iu.mostrarModal("El jugador: " + data.nick + " ha dicho UNO!!");
+            }
+        });
 
         this.socket.on("final", function (data) {
             if (data.ganador == cli.nick) {
@@ -195,12 +193,6 @@ function ClienteWS() {
             ui.limpiar();
             ui.mostrarAgregarJugador();
         });
-
-        /*
-        this.socket.on("leQuedaUna",function(data){
-			iu.mostrarModal("Jugador: "+data.nick+" ¡Me queda una carta!");
-		})
-        */
     }
     this.conectar();
 }
