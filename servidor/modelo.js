@@ -174,7 +174,7 @@ function Juego(test) {
         this.cad.encontrarUsuarioCriterio({ email: email }, function (usr) {
             if (usr) {
                 var clavedesCifrada = cf.decryptStr(usr.clave, 'sEcrEtA');
-                if (clave == clavedesCifrada && usr.confirmada) {
+                if (clave == clavedesCifrada) {
                     cb(null, usr);
                     ju.agregarJugador(usr.nick);
                     console.log("Usuario " + usr.nick + " inicia sesión")
@@ -258,7 +258,22 @@ function Jugador(nick, juego) {
         if (carta) {
             var partida = this.obtenerPartida(this.codigoPartida);
             partida.jugarCarta(carta, this.nick);
-            
+        }
+    }
+
+    this.colorComodin = function (num, color) {
+        var carta = this.mano[num];
+        if (carta) {
+            var partida = this.obtenerPartida(this.codigoPartida);
+            partida.colorComodin(carta, color, this.nick);
+        }
+    }
+
+    this.checkComodin = function (num) {
+        var carta = this.mano[num];
+        if (carta) {
+            var partida = this.obtenerPartida(this.codigoPartida);
+            partida.checkComodin(carta, this.nick);
         }
     }
 
@@ -295,7 +310,7 @@ function Jugador(nick, juego) {
         this.juego.insertarResultado(resultado);
     }
 
-    //new Bloqueo y Mas2
+    //new Bloqueo, Mas2 y Mas4
     this.recibeTurno = function (partida) {
         this.estado.recibeTurno(partida, this);
     }
@@ -306,6 +321,10 @@ function Jugador(nick, juego) {
 
     this.mas2 = function(){
         this.estado = new Mas2robo();
+    }
+
+    this.mas4 = function(){
+        this.estado = new Mas4robo();
     }
 
 }
@@ -333,6 +352,16 @@ function Mas2robo() {
     this.recibeTurno = function (partida, jugador) {
         partida.jugadorPuedeJugar(jugador);
         jugador.robar(2);
+        jugador.pasarTurno();
+        jugador.estado = new Normal();
+    }
+}
+
+function Mas4robo() {
+    this.nombre = "mas4"
+    this.recibeTurno = function (partida, jugador) {
+        partida.jugadorPuedeJugar(jugador);
+        jugador.robar(4);
         jugador.pasarTurno();
         jugador.estado = new Normal();
     }
@@ -388,12 +417,12 @@ function Partida(codigo, jugador, numJug) {
             this.mazo.push(new Mas2(20, colores[i]));
             this.mazo.push(new Mas2(20, colores[i]));
         }
-        /*
+        
         for (i = 0; i < 4; i++) {
             this.mazo.push(new Comodin(50, ""));
             this.mazo.push(new Comodin4(50, ""));
         }
-        */
+        
     };
 
     this.asignarUnaCarta = function () {
@@ -454,6 +483,14 @@ function Partida(codigo, jugador, numJug) {
         this.fase.jugarCarta(carta, nick, this);
     }
 
+    this.colorComodin = function (carta, color, nick) {
+        this.fase.colorComodin(carta, color, nick, this);
+    }
+
+    this.checkComodin = function (carta, nick) {
+        this.fase.checkComodin(carta, nick, this);
+    }
+
     this.meQuedaUna = function (nick) {
         this.fase.meQuedaUna(nick, this);
     }
@@ -469,6 +506,20 @@ function Partida(codigo, jugador, numJug) {
         }
     }
 
+    this.puedeColorComodin = function (carta, color, nick) {
+        if (nick == this.turno.nick) {
+            if (this.comprobarCarta(carta)) {
+                carta.color = color;
+            }
+        }
+    }
+
+    this.puedeCheckComodin = function (carta, nick) {
+        if (nick == this.turno.nick) {
+            return carta.tipo == "comodin";
+        }
+    }
+
     this.cambiarCartaActual = function (carta) {
         this.mesa.push(this.cartaActual);
         this.cartaActual = carta;
@@ -479,16 +530,9 @@ function Partida(codigo, jugador, numJug) {
         return (this.cartaActual.tipo == "numero" && (this.cartaActual.color == carta.color || this.cartaActual.valor == carta.valor)
             || this.cartaActual.tipo == "cambio" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
             || this.cartaActual.tipo == "bloqueo" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
-            || this.cartaActual.tipo == "mas2" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo))
+            || this.cartaActual.tipo == "mas2" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
+            || carta.tipo == "comodin")
     }
-
-    /*
-    this.comprobarCarta = function (carta) {
-        return (this.cartaActual.tipo == "numero" && (this.cartaActual.color == carta.color || this.cartaActual.valor == carta.valor)
-            || this.cartaActual.tipo != "numero" && (this.cartaActual.color == carta.color || this.cartaActual.valor == carta.valor))
-    }
-    //Falta gestionar comodin y comodin4
-    */
 
     this.cambiarDireccion = function () {
         if (this.direccion.nombre == "derecha") {
@@ -527,9 +571,17 @@ function Partida(codigo, jugador, numJug) {
     this.mas2Siguiente = function () {
         //obtener quien es el siguiente jugador (Dirección)
         var jugador = this.direccion.obtenerSiguiente(this);
-        //y se chupa 2
+        //y roba 2
         jugador.mas2();
     }
+
+    this.mas4Siguiente = function () {
+        //obtener quien es el siguiente jugador (Dirección)
+        var jugador = this.direccion.obtenerSiguiente(this);
+        //y roba 4
+        jugador.mas4();
+    }
+
 
     this.crearMazo();
     this.unirAPartida(jugador);
@@ -556,6 +608,14 @@ function Inicial() {
         console.log("La partida no ha comenzado");
     }
 
+    this.colorComodin = function (carta, color, nick, partida) {
+        console.log("La partida no ha comenzado");
+    }
+
+    this.checkComodin = function (carta, nick, partida) {
+        console.log("La partida no ha comenzado")
+    }
+
     this.meQuedaUna = function (nick) {
         console.log("La partida no ha comenzado");
     }
@@ -577,6 +637,14 @@ function Jugando() {
         partida.puedeJugarCarta(carta, nick);
     }
 
+    this.colorComodin = function (carta, color, nick, partida) {
+        partida.puedeColorComodin(carta, color, nick);
+    }
+
+    this.checkComodin = function (carta, nick, partida) {
+        partida.puedeCheckComodin(carta, nick);
+    }
+
     this.meQuedaUna = function (nick) {
         console.log("A " +nick+ " le queda una carta");
     }
@@ -596,6 +664,14 @@ function Final() {
 
     this.jugarCarta = function (carta, nick, partida) {
         console.log("La partida ya ha terminado");
+    }
+
+    this.colorComodin = function (carta, color, nick, partida) {
+        console.log("La partida ya ha terminado");
+    }
+
+    this.checkComodin = function (carta, nick, partida) {
+        console.log("La partida ya ha comenzado")
     }
 
     this.meQuedaUna = function (nick) {
@@ -687,22 +763,22 @@ function Mas2(valor, color) {
 //Not implemented
 function Comodin(valor, color) {
     this.tipo = "comodin";
-    //this.nombre = "comodin";
+    this.nombre = "comodin";
     this.valor = valor;
     this.color = color;
     this.comprobarEfecto = function (partida) {
-
+        //partida.comodinColor();
     }
 }
 
 //Not implemented
 function Comodin4(valor, color) {
-    this.tipo = "comodin4";
-    //this.nombre = "comodin4";
+    this.tipo = "comodin";
+    this.nombre = "comodin4";
     this.valor = valor;
     this.color = color;
     this.comprobarEfecto = function (partida) {
-
+        partida.mas4Siguiente();
     }
 }
 

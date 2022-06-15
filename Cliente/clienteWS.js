@@ -27,6 +27,10 @@ function ClienteWS() {
         this.socket.emit("jugarCarta", this.nick, num);
     }
 
+    this.comodin = function (num) {
+        this.socket.emit("comodin", this.nick, num);
+    }
+
     this.robarCarta = function (num) {
         this.socket.emit("robar", this.nick, num);
     }

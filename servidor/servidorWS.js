@@ -111,6 +111,20 @@ function ServidorWS() {
                 }
             })
 
+            socket.on("checkComodin", function (nick, num) {
+                var jugador = juego.usuarios[nick];
+                if (jugador) {
+                    jugador.checkComodin(num);
+                }
+            })
+
+            socket.on("colorComodin", function (nick, num, color) {
+                var jugador = juego.usuarios[nick];
+                if (jugador) {
+                    jugador.colorComodin(num, color);
+                }
+            })
+
             socket.on("robar", function (nick, num) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
@@ -131,7 +145,7 @@ function ServidorWS() {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.pasarTurno();
-                    cli.enviarAlRemitente(socket, "mano", jugador.mano);
+                    //cli.enviarAlRemitente(socket, "mano", jugador.mano);
                     var codigo = jugador.codigoPartida;
                     var partida = juego.partidas[codigo];
                     var nickTurno = partida.turno.nick;

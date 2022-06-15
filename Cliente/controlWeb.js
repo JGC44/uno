@@ -4,10 +4,10 @@ function ControlWeb() {
     this.comprobarUsuario = function () {
         if ($.cookie("nick")){
             ws.nick=$.cookie("nick");
-            //iu.mostrarHome({nick:ws.nick});
+            iu.mostrarHome({nick:ws.nick});
         }else{
-            //iu.mostrarLogin();
-            iu.mostrarAgregarJugador();
+            iu.mostrarLogin();
+            //iu.mostrarAgregarJugador();
         }
     }
     /*
@@ -28,6 +28,10 @@ function ControlWeb() {
         rest.obtenerPartidasDisponibles();
     }
 
+    this.limpiarSignup= function(data){
+        $("#signup").remove();
+    }
+
     this.mostrarRegistro=function(){
 		$('#signup').load("/cliente/signup.html",function(){
 			$("#btnSU").on("click",function(e){
@@ -38,8 +42,6 @@ function ControlWeb() {
 				else{
 					var email=$('#email').val();
 					var pass=$('#password').val();
-					//$("#mAJ").remove();
-					//$("#aviso").remove();
 					rest.registrarUsuario(email,pass);
 				}
 			})
@@ -199,16 +201,16 @@ function ControlWeb() {
             $("#btnSP").remove();
 
             //limpiarTodo
-            iu.mostrarAgregarJugador();
+            iu.mostrarLogin();
         })
     }
 
     //mostrarTurno
     this.mostrarTurno = function (nick) {
         $('#mTur').remove();
-        var cadena = '<div id="mTur">'
-        // cadena += '<div class="card-body text-center">'
-        // cadena += '<p class="card-text">Turno</p>';
+        //var cadena = '<div id="mTur">'
+        var cadena = '<div id="mTur" class="card-body text-center">'
+        //cadena += '<p class="card-text">Turno </p>' + nick;
         cadena += '<h6>Turno: </h6>' + nick;
         cadena += '</div>'
 
@@ -302,15 +304,48 @@ function ControlWeb() {
         $("#miModal").modal('show');
     }
 
-    this.mostrarAlertaUno = function (msg) {
-        $("#mAlertaUno").remove();
-        $("#mAlertaCodigo").remove();
-     
-        var cadena = '<div id="mAlertaUno" class="alert alert-primary alert-dismissible">';
-        cadena = cadena + '<button type="button" class="close" data-dismiss="alert">&times;</button>';
-        cadena = cadena + '<strong>Al jugador ' + msg + ' le queda solo una carta! </strong></div>';
-        $("#alerta").append(cadena);
+    //new
+    this.mostrarCambioColor = function (number) {
+        $('#cMC').remove();
+        var cadena = '<div id="cMC" class ="card bg-light">'
+        cadena += '<p> Selecciona a que color cambiar </p>'
+        cadena += '<div class="btn-group">'
+        cadena += '<button type="button" id="btnAzul" class="btn btn-primary">Azul</button>'
+        cadena += '<button type="button" id="btnVerde" class="btn btn-success">Verde</button>'
+        cadena += '<button type="button" id="btnAmarillo" class="btn btn-warning">Amarillo</button>'
+        cadena += '<button type="button" id="btnRojo" class="btn btn-danger">Rojo</button>'
+        cadena += '</div>'
+        cadena += '</div>'
+        
+        $('#cambioColor').append(cadena);
+
+        //on-click
+        $("#btnAzul").on("click", function () {
+            var color = "azul";
+            ws.colorComodin(number,color);
+            $('#cMC').remove();
+            ws.jugarCarta(number);
+        })
+        $("#btnVerde").on("click", function () {
+            var color = "verde";
+            ws.colorComodin(number,color);
+            $('#cMC').remove();
+            ws.jugarCarta(number);
+        })
+        $("#btnAmarillo").on("click", function () {
+            var color = "amarillo";
+            ws.colorComodin(number,color);
+            $('#cMC').remove();
+            ws.jugarCarta(number);
+        })
+        $("#btnRojo").on("click", function () {
+            var color = "rojo";
+            ws.colorComodin(number,color);
+            $('#cMC').remove();
+            ws.jugarCarta(number);
+        })
     }
+
 
     this.mostrarMano = function (lista) {
         $('#mM').remove();
@@ -320,11 +355,11 @@ function ControlWeb() {
         cadena += '<div class="card-columns">'
         
         for (i = 0; i < lista.length; i++) {
-            //var carta = lista[i].nombre.img + ".png"
+            var carta = lista[i].nombre;
             cadena += '<div class ="card bg-light">'
             //cadena += '<div class="card-body text-center">'
-            cadena += '<a href="#" value="' + i + '" class="list-group-item list-group-item-action">';
-            cadena += '<img class="card-img-top" src="/cliente/img/cartas/'+lista[i].nombre +'.png" alt="Card image" style="width:50px;">'
+            cadena += '<a href="#" value="' + i + '" nombre="' + carta + '" class="list-group-item list-group-item-action">';
+            cadena += '<img class="card-img-top" src="/cliente/img/cartas/'+ carta +'.png" alt="Card image" style="width:50px;">'
             //cadena += '<p class="card-text">' + lista[i].tipo + ' ' + lista[i].color + ' ' + lista[i].valor + '</p>';
             cadena += '</div>';
         }
@@ -335,13 +370,22 @@ function ControlWeb() {
         //on click
         $(".card-columns a").click(function () {
             var number = -1;
+            var nombre = "a";
             number = $(this).attr("value");
+            nombre = $(this).attr("nombre");
             if (number != -1) {
-                ws.jugarCarta(number);
+                if (nombre == "comodin" || "comodin4") {
+                    //ws.checkComodin(number)
+                    iu.mostrarCambioColor(number)
+                } //else {
+                    //iu.mostrarCambioColor(number)
+                    ws.jugarCarta(number);
+                //}
             }
-            // mostrar me queda 1
         })
     }
+
+    
 
     this.mostrarRobar = function () {
         var cadena = '<div id="mR"><button type="button" id="btnR" class="btn btn-primary">Robar</button>';

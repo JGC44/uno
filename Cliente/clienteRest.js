@@ -26,18 +26,17 @@ function ClienteRest() {
             data: JSON.stringify({ "email": email, "clave": clave }),
             success: function (data) {
                 if (data.nick != "nook") {
-                    //mostrarLogin
                     console.log("Inicio de sesion exitoso: " + data.email);
                     ws.nick = data.nick;
-                    iu.mostrarHome();
                     $.cookie("nick",data.nick);
-
+                    iu.limpiarSignup()
+                    iu.mostrarHome(data);
 
                 } else {
                     console.log(data);
                     console.log("Usuario  o clave incorrecta");
                     iu.mostrarModal("Usuario o clave incorrecta");
-                    iu.mostrarInicio();
+                    iu.mostrarLogin();
                 }
             },
             contentType: 'application/json',
@@ -150,6 +149,12 @@ function ClienteRest() {
 
     this.robarCarta = function (nick, numero) {
         $.getJSON("/robarCarta/" + nick + "/" + numero, function (data) {
+            console.log(data);
+        });
+    }
+
+    this.meQuedaUna = function (nick, numero) {
+        $.getJSON("/meQuedaUna/" + nick + "/" + numero, function (data) {
             console.log(data);
         });
     }

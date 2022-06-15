@@ -91,7 +91,7 @@ function CAD() {
             else {
                 console.log("Conectando a Atlas MongoDB")
                 cad.resultadosCol = db.db("unoDB1").collection("resultados");  //CAD con mayuscula?
-                //cad.usuariosCol = db.db("unoDB1").collection("usuarios");
+                cad.usuariosCol = db.db("unoDB1").collection("usuarios");
             }
         })
     }
