@@ -432,6 +432,9 @@ function Partida(codigo, jugador, numJug) {
             var indice = randomInt(1, maxCartas) - 1;
             var carta = this.mazo.splice(indice, 1);
             res = carta[0];
+            if (res.tipo == "comodin") {
+                res.color = "azul"; //Color default en caso de que la primera carta sea un comodin
+            }
         }
         return res;
     }

@@ -58,11 +58,6 @@ function ClienteWS() {
     }
 
     /*
-    this.usuarioEliminado = function(){
-		this.socket.emit("usuarioEliminado", this.nick);
-	}
-
-    
     this.finalPartida=function(){
 		this.socket.emit("finalPartida",this.nick);	
 	}
@@ -78,10 +73,7 @@ function ClienteWS() {
         this.socket.on("partidaCreada", function (data) {
             console.log(data);
             ws.codigo = data.codigo;
-            //cli.codigo=data.codigo;
             iu.mostrarCodigo(ws.codigo);
-            //iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
-			//iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
@@ -95,52 +87,21 @@ function ClienteWS() {
         this.socket.on("unidoAPartida", function (data) {
             console.log(data);
             cli.codigo = data.codigo;
-            //iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"1");
-			//iu.mostrarAbandonar();
             iu.mostrarEsperando();
         })
 
-        /*
-        this.socket.on("nuevoJugador",function(lista){
-			iu.mostrarRivales(lista);
-		})
-        */
-
         this.socket.on("pedirCartas", function (data) {
             cli.manoInicial();
-            //iu.limpiar();
-			//iu.mostrarJugando({ nick: cli.nick, codigo: cli.codigo});
             iu.mostrarRobar();
         })
 
         this.socket.on("mano", function (data) {
             console.log(data);
-            /*
-            iu.quitarEsperando();
-			iu.mostrarControl({nick:cli.nick,codigo:cli.codigo},"2");
-			iu.mostrarRobar();
-			iu.mostrarMeQueda1();
-            */
             iu.mostrarMano(data);
         })
 
-        /*
-        this.socket.on("manoUpdate",function(data){
-			console.log(data);
-			iu.mostrarMano(data);
-		});
-        */
-
         this.socket.on("turno", function (data) {
             console.log(data);
-            /*
-            cli.obtenerMano();
-			iu.mostrarRivales(data.rivales);
-			iu.mostrarCarta(data.cartaActual,"actual");
-            //iu.mostrarCartaActual(data.cartaActual);
-			cli.meToca=data.turno==cli.nick;
-			iu.mostrarTurno(cli.meToca);
-            */
             iu.mostrarCartaActual(data.cartaActual);
             iu.mostrarTurno(data.turno);
         })
@@ -167,13 +128,13 @@ function ClienteWS() {
         this.socket.on("final", function (data) {
             if (data.ganador == cli.nick) {
                 iu.mostrarModal("Enhorabuena, has ganado!!");
-                iu.abandonar();
+                iu.mostrarAbandonarJuego();
             }
             else {
                 iu.mostrarModal("Game Over, " + data.ganador + " ha ganado." );
-                //cli.finalPartida();
-                iu.abandonar();
+                iu.mostrarAbandonarJuego();
             }
+
         });
 
         this.socket.on("fallo", function (data) {
@@ -188,7 +149,6 @@ function ClienteWS() {
         
         this.socket.on("abandonarPartida", function (data) {
 			ui.mostrarModal("Un jugador ha abandonado la partida");
-            //iu.abandonar();
             ui.limpiar();
             ui.mostrarHome({ nick: cli.nick });
             cli.codigo = "";
@@ -196,7 +156,6 @@ function ClienteWS() {
         
         this.socket.on("jugadorAbandona", function (data) {
             ui.mostrarModal("Un jugador ha abandonado la partida");
-            //iu.abandonar();
             ui.limpiar();
             ui.mostrarHome({ nick: cli.nick });
             cli.codigo = "";
