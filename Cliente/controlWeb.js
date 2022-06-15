@@ -306,16 +306,16 @@ function ControlWeb() {
 
     //new
     this.mostrarCambioColor = function (number) {
-        $('#cMC').remove();
-        var cadena = '<div id="cMC" class ="card bg-light">'
-        cadena += '<p> Selecciona a que color cambiar </p>'
-        cadena += '<div class="btn-group">'
-        cadena += '<button type="button" id="btnAzul" class="btn btn-primary">Azul</button>'
-        cadena += '<button type="button" id="btnVerde" class="btn btn-success">Verde</button>'
-        cadena += '<button type="button" id="btnAmarillo" class="btn btn-warning">Amarillo</button>'
-        cadena += '<button type="button" id="btnRojo" class="btn btn-danger">Rojo</button>'
-        cadena += '</div>'
-        cadena += '</div>'
+        $('#mMC').remove();
+        var cadena = '<div id="mMC" class ="card bg-light">';
+        cadena += '<p> Selecciona a que color cambiar </p>';
+        cadena += '<div id="" class="btn-group">';
+        cadena += '<button type="button" id="btnAzul" class="btn btn-primary">Azul</button>';
+        cadena += '<button type="button" id="btnVerde" class="btn btn-success">Verde</button>';
+        cadena += '<button type="button" id="btnAmarillo" class="btn btn-warning">Amarillo</button>';
+        cadena += '<button type="button" id="btnRojo" class="btn btn-danger">Rojo</button>';
+        cadena += '</div>';
+        cadena += '</div>';
         
         $('#cambioColor').append(cadena);
 
@@ -323,25 +323,25 @@ function ControlWeb() {
         $("#btnAzul").on("click", function () {
             var color = "azul";
             ws.colorComodin(number,color);
-            $('#cMC').remove();
+            $('#mMC').remove();
             ws.jugarCarta(number);
         })
         $("#btnVerde").on("click", function () {
             var color = "verde";
             ws.colorComodin(number,color);
-            $('#cMC').remove();
+            $('#mMC').remove();
             ws.jugarCarta(number);
         })
         $("#btnAmarillo").on("click", function () {
             var color = "amarillo";
             ws.colorComodin(number,color);
-            $('#cMC').remove();
+            $('#mMC').remove();
             ws.jugarCarta(number);
         })
         $("#btnRojo").on("click", function () {
             var color = "rojo";
             ws.colorComodin(number,color);
-            $('#cMC').remove();
+            $('#mMC').remove();
             ws.jugarCarta(number);
         })
     }
