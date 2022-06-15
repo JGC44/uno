@@ -28,7 +28,7 @@ function ControlWeb() {
         rest.obtenerPartidasDisponibles();
     }
 
-    this.limpiarSignup= function(data){
+    this.limpiarSignup= function(){
         $("#signup").remove();
     }
 
@@ -368,19 +368,17 @@ function ControlWeb() {
         $('#mano').append(cadena);
 
         //on click
-        $(".card-columns a").click(function () {
+        $(".card-columns a").on("click", function () {
             var number = -1;
-            var nombre = "a";
+            var nombre = "";
             number = $(this).attr("value");
             nombre = $(this).attr("nombre");
             if (number != -1) {
-                if (nombre == "comodin" || "comodin4") {
-                    //ws.checkComodin(number)
+                if (nombre == "comodin" || nombre == "comodin4") {
                     iu.mostrarCambioColor(number)
-                } //else {
-                    //iu.mostrarCambioColor(number)
+                } else {
                     ws.jugarCarta(number);
-                //}
+                }
             }
         })
     }

@@ -122,6 +122,8 @@ function ServidorWS() {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.colorComodin(num, color);
+                    var codigo = jugador.codigoPartida;
+                    cli.enviarATodos(io, codigo, "cambiarColor", { nick: jugador.nick, color: color });
                 }
             });
 

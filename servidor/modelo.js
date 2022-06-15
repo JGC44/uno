@@ -531,6 +531,7 @@ function Partida(codigo, jugador, numJug) {
             || this.cartaActual.tipo == "cambio" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
             || this.cartaActual.tipo == "bloqueo" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
             || this.cartaActual.tipo == "mas2" && (this.cartaActual.color == carta.color || this.cartaActual.tipo == carta.tipo)
+            || this.cartaActual.tipo == "comodin" && this.cartaActual.color == carta.color
             || carta.tipo == "comodin")
     }
 

@@ -154,13 +154,23 @@ function ClienteWS() {
             }
         });
 
+        this.socket.on("cambiarColor", function (data) {
+            var color = data.color;
+            if (data.nick == cli.nick) {
+                iu.mostrarModal("Has cambiado a " + color);
+            }
+            else {
+                iu.mostrarModal("El jugador: " + data.nick + " ha cambiado a " + color);
+            }
+        });
+
         this.socket.on("final", function (data) {
             if (data.ganador == cli.nick) {
                 iu.mostrarModal("Enhorabuena, has ganado!!");
                 iu.abandonar();
             }
             else {
-                iu.mostrarModal("Game Over. Ha ganado: " + data.ganador);
+                iu.mostrarModal("Game Over, " + data.ganador + " ha ganado." );
                 //cli.finalPartida();
                 iu.abandonar();
             }

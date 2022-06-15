@@ -159,6 +159,12 @@ function ClienteRest() {
         });
     }
 
+    this.cambiarColor = function (nick, color) {
+        $.getJSON("/cambiarColor/" + nick + "/" + color, function (data) {
+            console.log(data);
+        });
+    }
+
     this.pasarTurno = function () {
         $.getJSON("/pasarTurno", function (data) {
             console.log(data);
