@@ -109,21 +109,21 @@ function ServidorWS() {
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
-            })
+            });
 
             socket.on("checkComodin", function (nick, num) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.checkComodin(num);
                 }
-            })
+            });
 
             socket.on("colorComodin", function (nick, num, color) {
                 var jugador = juego.usuarios[nick];
                 if (jugador) {
                     jugador.colorComodin(num, color);
                 }
-            })
+            });
 
             socket.on("robar", function (nick, num) {
                 var jugador = juego.usuarios[nick];
@@ -139,7 +139,7 @@ function ServidorWS() {
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
-            })
+            });
 
             socket.on("pasarTurno", function (nick) {
                 var jugador = juego.usuarios[nick];
@@ -153,7 +153,7 @@ function ServidorWS() {
                 } else {
                     cli.enviarAlRemitente(socket, "fallo", "El usuario no existe")
                 }
-            })
+            });
 
             //new
             socket.on("abandonarPartida", function (nick) {
@@ -163,7 +163,7 @@ function ServidorWS() {
                     var codigo = ju1.codigoPartida;
                     cli.enviarATodos(io, codigo, "jugadorAbandona", {});
                 }
-            })
+            });
 
             socket.on("cerrarSesion", function (nick) {
                 var ju1 = juego.usuarios[nick];
@@ -177,7 +177,7 @@ function ServidorWS() {
                     ju1.cerrarSesion();
                     cli.enviarAlRemitente(socket, "usuarioEliminado", {});
                 }
-            })
+            });
 
         })
     }

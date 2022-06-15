@@ -27,8 +27,12 @@ function ClienteWS() {
         this.socket.emit("jugarCarta", this.nick, num);
     }
 
-    this.comodin = function (num) {
-        this.socket.emit("comodin", this.nick, num);
+    this.checkComodin = function (num) {
+        this.socket.emit("checkComodin", this.nick, num);
+    }
+
+    this.colorComodin = function (num, color) {
+        this.socket.emit("colorComodin", this.nick, num, color);
     }
 
     this.robarCarta = function (num) {
